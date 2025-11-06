@@ -1,0 +1,16 @@
+faster-whisper
+sentence-transformers
+faiss-cpu
+torch
+torchvision
+torchaudio
+transformers
+librosa
+sounddevice
+pydub
+soundfile
+numpy
+fastapi
+uvicorn[standard]
+streamlit
+reportlab

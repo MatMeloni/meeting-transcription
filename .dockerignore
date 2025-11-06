@@ -1,0 +1,11 @@
+.git
+.gitignore
+__pycache__/
+*.pyc
+outputs/
+frontend/
+backend/
+.venv/
+env/
+*.wav
+*.mp3
