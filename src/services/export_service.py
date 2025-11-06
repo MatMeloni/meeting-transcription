@@ -8,7 +8,7 @@ from typing import Dict, List
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-from utils.config import AppConfig
+from config import AppConfig
 from utils.text_utils import approximate_token_count
 
 

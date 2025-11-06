@@ -4,10 +4,10 @@ import logging
 import re
 from typing import Dict, List
 
+from config import AppConfig
 from models.summarizer_model import SummarizerModelLoader
 from services.semantic_service import SemanticCluster
 from utils import text_utils
-from utils.config import AppConfig
 
 
 class SummarizationService:

@@ -6,8 +6,8 @@ from typing import Optional
 
 import numpy as np
 
+from config import AppConfig
 from utils import audio_utils
-from utils.config import AppConfig
 
 try:
     import sounddevice as sd

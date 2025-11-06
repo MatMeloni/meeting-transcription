@@ -6,9 +6,9 @@ from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
+from config import AppConfig
 from models.embedding_model import EmbeddingModelLoader
 from utils import text_utils
-from utils.config import AppConfig
 
 
 @dataclass

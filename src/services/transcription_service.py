@@ -7,8 +7,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
+from config import AppConfig
 from models.whisper_model import WhisperModelLoader
-from utils.config import AppConfig
 from utils.text_utils import clean_text
 
 

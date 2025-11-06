@@ -5,7 +5,7 @@ from typing import Optional
 
 from faster_whisper import WhisperModel
 
-from utils.config import AppConfig
+from config import AppConfig
 
 
 class WhisperModelLoader:

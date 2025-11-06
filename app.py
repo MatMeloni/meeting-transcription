@@ -1,7 +1,8 @@
-"""Shim module to expose src.app entry-points as python app.py."""
+"""Shim module to expose backend entry-points as python app.py."""
 
-from src.app import API_APP, CONFIG, ORCHESTRATOR, _running_with_streamlit, main_cli  # noqa: F401
+from backend import API_APP, CONFIG, CONTROLLER  # noqa: F401
+from backend.cli import run_cli
 
 
-if __name__ == "__main__" and not _running_with_streamlit():
-    main_cli(ORCHESTRATOR)
+if __name__ == "__main__":
+    run_cli(CONTROLLER)

@@ -4,7 +4,7 @@ import logging
 
 from transformers import pipeline
 
-from utils.config import AppConfig
+from config import AppConfig
 
 
 class SummarizerModelLoader:

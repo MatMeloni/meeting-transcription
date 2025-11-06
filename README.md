@@ -1,14 +1,41 @@
 # Meeting Transcription
 
-Pipeline modular de captura de áudio, transcrição (Whisper), análise semântica (Sentence-BERT) e sumarização automática (T5). A saída gera relatórios em TXT, PDF e JSON e pode ser orquestrada via CLI, FastAPI ou Streamlit.
+Aplicação modular para transcrever reuniões com Whisper, gerar embeddings com Sentence-BERT e produzir resumos estruturados com T5. A arquitetura separa o núcleo de IA (`src/`) dos componentes de controle e API (`backend/`), permitindo reutilização do pipeline em outros projetos.
 
-## Requisitos
+```
+Usuário → Interface (Streamlit / Frontend) → Backend (FastAPI + Controller) → IA Core (src) → Modelos & Relatórios
+```
+
+## Estrutura do repositório
+
+```
+├── backend/          # API FastAPI, controladores e modelos Pydantic
+│   ├── api/
+│   ├── controller/
+│   └── model/
+├── frontend/         # Espaço reservado para UI web (Next.js ou similar)
+├── src/              # Núcleo de IA (serviços, modelos, utilitários, configuração)
+│   ├── app.py
+│   ├── config/
+│   ├── models/
+│   ├── outputs/
+│   ├── services/
+│   └── utils/
+├── tests/            # Testes com pytest
+├── Dockerfile
+├── requirements.txt
+└── README.md
+```
+
+## Configuração
+
+Requisitos:
 
 - Python 3.10+
-- FFmpeg e libsndfile (para manipular áudio)
-- Dependências Python listadas em `requirements.txt`
+- FFmpeg e libsndfile instalados no sistema
+- Dependências do `requirements.txt`
 
-Instale localmente:
+Instalação:
 
 ```bash
 python -m venv .venv
@@ -17,13 +44,21 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## Execução local
+As configurações principais ficam em `src/config/settings.py`. Use variáveis de ambiente para trocar modelos (por exemplo `WHISPER_MODEL`, `EMBEDDING_MODEL`, `OUTPUT_DIR`).
 
-### CLI
+## Execução
+
+### Linha de comando
 
 ```bash
 python app.py --audio caminho/para/reuniao.wav --meeting-name "Sprint Review"
 ```
+
+Parâmetros úteis:
+
+- `--serve` para iniciar a API
+- `--duration 60` para capturar áudio do microfone por 60s
+- `--no-export` para desabilitar PDFs/JSON
 
 ### API FastAPI
 
@@ -32,8 +67,9 @@ python app.py --serve --host 0.0.0.0 --port 8000
 ```
 
 Endpoints:
-- `GET /health` – verificação
-- `POST /transcribe` – arquivo de áudio + `meeting_name`
+
+- `GET /health`
+- `POST /transcribe` (multipart com `file` + `meeting_name`)
 
 ### Interface Streamlit
 
@@ -41,44 +77,36 @@ Endpoints:
 streamlit run app.py
 ```
 
-## Uso com Docker (deploy em Railway/Render/Fly)
+O módulo detecta o contexto Streamlit e renderiza o painel para upload, captura pelo microfone e download dos relatórios.
 
-1. Construa a imagem:
-   ```bash
-   docker build -t meeting-transcription .
-   ```
-2. Execute localmente:
-   ```bash
-   docker run -p 8000:8000 -v "%cd%/outputs:/app/outputs" meeting-transcription
-   ```
-   Monte o volume `outputs/` para persistir arquivos gerados.
+## Testes
 
-### Deploy sugerido
+Execute os testes automatizados:
 
-1. **Railway/Render/Fly.io**
-   - Crie um serviço do tipo *Web* e aponte para este repositório.
-   - Configure o build para usar `Dockerfile`.
-   - Defina variáveis de ambiente (se necessário) no painel.
-   - Garanta storage persistente para `/app/outputs`.
+```bash
+pytest
+```
 
-2. **HuggingFace Spaces / Streamlit Cloud** (demonstração rápida)
-   - Publique a pasta com `app.py`, `src/` e `requirements.txt`.
-   - Configure o Space como Streamlit.
+Os testes cobrem utilidades de transcrição, normalização semântica e sumarização usando dublês de modelos.
 
-## Integração com front-end na Vercel
+## Deploy com Docker (Railway, Render, Fly.io, etc.)
 
-- Hospede o backend em um provedor persistente (Railway, Render, Fly.io, etc.).
-- Na Vercel, desenvolva a UI (Next.js) que:
-  1. Envia arquivos `.wav/.mp3` via `POST` para `/transcribe`.
-  2. Consome atualizações do resumo exibindo as seções retornadas.
-  3. Oferece links de download usando os caminhos retornados no JSON (ou reexpõe via backend).
-- Ative CORS no backend (já configurado) e utilize HTTPS em produção.
+```bash
+docker build -t meeting-transcription .
+docker run -p 8000:8000 -v "%cd%/outputs:/app/src/outputs" meeting-transcription
+```
 
-## Principais arquivos
+Monte um volume para `src/outputs` se quiser persistir relatórios. Em provedores como Railway/Render, configure o serviço como Web e aponte para o `Dockerfile`.
 
-- `src/app.py` – orquestração FastAPI/CLI/Streamlit.
-- `src/services/` – captura, transcrição, embeddings, sumarização, exportação.
-- `src/models/` – carregadores dos modelos Whisper, Sentence-BERT e T5.
-- `src/utils/` – configuração, utilitários de áudio e texto.
-- `Dockerfile` – imagem pronta para deploy em contêiner.
-- `requirements.txt` – dependências.
+## Integração com Front-end na Vercel
+
+- Hospede o backend em um provedor com processos persistentes (Railway, Render, Fly.io).
+- Aponte o front-end Next.js (na Vercel) para a URL pública do backend (`POST /transcribe`).
+- Utilize o guia `docs/vercel_frontend_integration.md` para código de upload e opções de proxy.
+
+## Referências
+
+- Whisper – Radford et al. (2022)
+- Sentence-BERT – Reimers & Gurevych (2019)
+- T5 – Raffel et al. (2020)
+- Segmentação semântica textual – Alemi & Ginsparg (2015)

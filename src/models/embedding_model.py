@@ -5,7 +5,7 @@ from typing import Optional
 
 from sentence_transformers import SentenceTransformer
 
-from utils.config import AppConfig
+from config import AppConfig
 
 
 class EmbeddingModelLoader:
