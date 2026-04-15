@@ -1,6 +1,6 @@
 """Shim module to expose backend entry-points as python app.py."""
 
-from backend import API_APP, CONFIG, CONTROLLER  # noqa: F401
+from backend.runtime import API_APP, CONFIG, CONTROLLER  # noqa: F401
 from backend.cli import run_cli
 
 

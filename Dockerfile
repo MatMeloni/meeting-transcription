@@ -14,7 +14,7 @@ COPY src ./src
 COPY backend ./backend
 COPY app.py .
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app:/app/src
 EXPOSE 8000
 
 CMD ["uvicorn", "backend.runtime:API_APP", "--host", "0.0.0.0", "--port", "8000"]

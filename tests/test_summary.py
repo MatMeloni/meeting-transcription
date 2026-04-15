@@ -1,3 +1,7 @@
+import pytest
+
+pytest.importorskip("sentence_transformers")
+
 import numpy as np
 
 from config import AppConfig, ensure_output_dirs

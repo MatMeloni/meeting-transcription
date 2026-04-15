@@ -8,6 +8,7 @@ Guia para conectar um front-end (Next.js/React) hospedado na Vercel ao backend d
 2. Garanta que o serviço esteja exposto em HTTPS (ex.: `https://meeting-api.example.com`).
 3. Configure armazenamento persistente para `/app/src/outputs` caso queira manter relatórios.
 4. Ajuste variáveis de ambiente no painel do provedor (ex.: `WHISPER_MODEL`, `SUMMARY_MAX_TOKENS`).
+5. **Limites de upload:** por padrão o backend aceita até `MAX_UPLOAD_BYTES` (50 MiB) e extensões listadas em `ALLOWED_AUDIO_EXTENSIONS` (`.wav`, `.mp3`, `.m4a`). Requisições maiores recebem HTTP **413**; extensão inválida retorna **400**. Ajuste essas variáveis no provedor se o seu front-end enviar outros formatos ou arquivos maiores.
 
 ## 2. Configurar o projeto Next.js
 

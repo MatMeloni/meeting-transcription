@@ -1,3 +1,1 @@
-"""FastAPI application factory for the backend."""
-
-from .app import create_app  # noqa: F401
+"""FastAPI routes and helpers. Use ``backend.api.app.create_app`` for the factory."""

@@ -54,6 +54,15 @@ class AppConfig:
 
     sample_audio_relative_path: Optional[str] = os.getenv("SAMPLE_AUDIO_RELATIVE_PATH")
 
+    max_upload_bytes: int = int(os.getenv("MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
+    allowed_audio_extensions: tuple[str, ...] = field(
+        default_factory=lambda: tuple(
+            ext.strip().lower()
+            for ext in os.getenv("ALLOWED_AUDIO_EXTENSIONS", ".wav,.mp3,.m4a").split(",")
+            if ext.strip()
+        )
+    )
+
     def __post_init__(self) -> None:
         """Derives dependent paths once base directory is known."""
         outputs = self.outputs_dir or (self.base_dir / "outputs")

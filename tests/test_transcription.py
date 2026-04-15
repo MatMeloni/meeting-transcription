@@ -1,3 +1,7 @@
+import pytest
+
+pytest.importorskip("faster_whisper")
+
 from config import AppConfig, ensure_output_dirs
 from services.transcription_service import TranscriptionService
 

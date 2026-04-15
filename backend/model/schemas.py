@@ -45,6 +45,7 @@ class PipelineResponseSchema(BaseModel):
     semantic_clusters: List[SemanticClusterSchema]
     summary: SummarySchema
     exports: Dict[str, Dict[str, str]] = {}
+    stage_timings: Dict[str, float] = {}
 
     @classmethod
     def from_result(cls, result: Dict[str, Any]) -> "PipelineResponseSchema":
@@ -59,5 +60,6 @@ class PipelineResponseSchema(BaseModel):
             "semantic_clusters": result.get("semantic_clusters", []),
             "summary": summary,
             "exports": result.get("exports", {}),
+            "stage_timings": result.get("stage_timings", {}),
         }
         return cls(**payload)

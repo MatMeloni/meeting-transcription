@@ -13,7 +13,9 @@ Usuário → Interface (Streamlit / Frontend) → Backend (FastAPI + Controller)
 │   ├── api/
 │   ├── controller/
 │   └── model/
-├── frontend/         # Espaço reservado para UI web (Next.js ou similar)
+├── frontend/         # Demo estática (`demo.html`) e espaço para UI web completa
+├── scripts/          # Benchmark e comparação A/B de modelos Whisper
+├── docs/             # Integração Vercel, protocolo de avaliação e template de resultados
 ├── src/              # Núcleo de IA (serviços, modelos, utilitários, configuração)
 │   ├── app.py
 │   ├── config/
@@ -69,7 +71,9 @@ python app.py --serve --host 0.0.0.0 --port 8000
 Endpoints:
 
 - `GET /health`
-- `POST /transcribe` (multipart com `file` + `meeting_name`)
+- `POST /transcribe` (multipart com `file` + `meeting_name`; resposta inclui `stage_timings` com segundos por etapa do pipeline)
+
+Limites de upload (configuráveis por ambiente): `MAX_UPLOAD_BYTES`, `ALLOWED_AUDIO_EXTENSIONS`.
 
 ### Interface Streamlit
 
@@ -79,6 +83,17 @@ streamlit run app.py
 
 O módulo detecta o contexto Streamlit e renderiza o painel para upload, captura pelo microfone e download dos relatórios.
 
+### Demo HTML estática
+
+Em `frontend/demo.html` há um formulário mínimo de upload contra a API (configure a URL base). Sirva a pasta com um servidor HTTP local (por exemplo `python -m http.server` dentro de `frontend/`) para evitar bloqueios de CORS ao abrir o arquivo diretamente do disco.
+
+## Avaliação e resultados (parecer / relatório)
+
+- [`docs/evaluation_protocol.md`](docs/evaluation_protocol.md) — protocolo para coletar métricas e evidências antes da seção de resultados.
+- [`docs/results_template.md`](docs/results_template.md) — tabela e campos qualitativos para preencher.
+- `python scripts/benchmark_pipeline.py --audio arquivo1.wav arquivo2.wav --output docs/runs/sua_rodada.md`
+- `python scripts/compare_whisper_models.py --audio arquivo.wav --models base small`
+
 ## Testes
 
 Execute os testes automatizados:
@@ -87,7 +102,11 @@ Execute os testes automatizados:
 pytest
 ```
 
-Os testes cobrem utilidades de transcrição, normalização semântica e sumarização usando dublês de modelos.
+Os testes cobrem utilidades de transcrição, normalização semântica e sumarização usando dublês de modelos, além de validação de upload na API e um fluxo integrado do pipeline com serviços dubados.
+
+## Agrupamento semântico
+
+O agrupamento de trechos usa **similaridade de cosseno** entre embeddings normalizados e uma fusão incremental por limiar (`SIMILARITY_THRESHOLD`). **Não** se utiliza FAISS no código atual; dependências antigas foram removidas para refletir a implementação real.
 
 ## Deploy com Docker (Railway, Render, Fly.io, etc.)
 

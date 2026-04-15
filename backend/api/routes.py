@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
+from backend.api.upload_validation import validate_audio_upload
 from backend.controller.pipeline_controller import PipelineController
 from backend.model import PipelineResponseSchema
 
@@ -28,6 +29,7 @@ def build_router(controller: PipelineController) -> APIRouter:
         payload = await file.read()
         if not payload:
             raise HTTPException(status_code=400, detail="Arquivo de áudio vazio.")
+        validate_audio_upload(file.filename, len(payload), controller.config)
         result = controller.process_uploaded_bytes(
             payload=payload,
             original_filename=file.filename or "upload.wav",

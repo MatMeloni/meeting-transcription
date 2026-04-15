@@ -85,5 +85,6 @@ def _print_result(result: dict) -> None:
         "timestamp": result["timestamp"],
         "summary": result["summary"],
         "exports": result["exports"],
+        "stage_timings": result.get("stage_timings", {}),
     }
     print(json.dumps(payload, ensure_ascii=False, indent=2))
