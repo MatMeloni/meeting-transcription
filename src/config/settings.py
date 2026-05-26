@@ -58,7 +58,7 @@ class AppConfig:
     allowed_audio_extensions: tuple[str, ...] = field(
         default_factory=lambda: tuple(
             ext.strip().lower()
-            for ext in os.getenv("ALLOWED_AUDIO_EXTENSIONS", ".wav,.mp3,.m4a").split(",")
+            for ext in os.getenv("ALLOWED_AUDIO_EXTENSIONS", ".wav,.mp3,.m4a,.webm,.ogg").split(",")
             if ext.strip()
         )
     )
