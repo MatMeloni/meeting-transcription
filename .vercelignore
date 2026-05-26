@@ -1,0 +1,8 @@
+app.py
+src/
+backend/
+requirements.txt
+Dockerfile
+pytest.ini
+tests/
+scripts/
