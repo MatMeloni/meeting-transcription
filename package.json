@@ -1,0 +1,7 @@
+{
+  "name": "meeting-transcription",
+  "version": "0.1.0",
+  "dependencies": {
+    "next": "14.2.5"
+  }
+}
