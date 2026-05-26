@@ -1,7 +1,7 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm --prefix vercel-frontend install && npm --prefix vercel-frontend run build",
-  "installCommand": "echo 'deps handled in buildCommand'",
+  "installCommand": "npm --prefix vercel-frontend install",
+  "buildCommand": "npm --prefix vercel-frontend run build",
   "outputDirectory": "vercel-frontend/.next",
   "devCommand": "npm --prefix vercel-frontend run dev -- --port $PORT"
 }
