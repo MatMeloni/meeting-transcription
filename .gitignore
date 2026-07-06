@@ -1,1 +1,20 @@
 .env
+
+# Áudios e saídas geradas em runtime
+Audios/
+*.wav
+*.mp3
+*.m4a
+*.ogg
+*.webm
+*.flac
+*.aac
+src/outputs/
+models_cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+env/

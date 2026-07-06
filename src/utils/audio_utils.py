@@ -35,8 +35,30 @@ def normalize_audio(audio: np.ndarray) -> np.ndarray:
     return normalized
 
 
-def reduce_noise(audio: np.ndarray, sr: int) -> np.ndarray:
-    """Performs a lightweight spectral subtraction noise reduction."""
+def reduce_noise(audio: np.ndarray, sr: int, chunk_seconds: float = 60.0) -> np.ndarray:
+    """Performs a lightweight spectral subtraction noise reduction in chunks.
+
+    Processes the signal in fixed-size chunks to avoid OOM errors on long
+    recordings (e.g. 100+ minute files at 192 kHz would require >2 GB at once).
+    """
+    chunk_size = int(chunk_seconds * sr)
+    if len(audio) <= chunk_size:
+        result = _reduce_noise_chunk(audio)
+        logging.debug("Ruído atenuado por subtração espectral simples")
+        return result
+
+    chunks = []
+    for start in range(0, len(audio), chunk_size):
+        chunk = audio[start : start + chunk_size]
+        chunks.append(_reduce_noise_chunk(chunk))
+    logging.debug(
+        "Ruído atenuado em %d chunks de %.0fs", len(chunks), chunk_seconds
+    )
+    return np.concatenate(chunks)
+
+
+def _reduce_noise_chunk(audio: np.ndarray) -> np.ndarray:
+    """Applies spectral subtraction to a single audio chunk."""
     stft = librosa.stft(audio)
     magnitude, phase = librosa.magphase(stft)
     noise_profile = np.mean(
@@ -44,9 +66,7 @@ def reduce_noise(audio: np.ndarray, sr: int) -> np.ndarray:
     )
     cleaned_magnitude = np.maximum(magnitude - noise_profile, 0.0)
     cleaned_audio = librosa.istft(cleaned_magnitude * phase)
-    cleaned_audio = librosa.util.fix_length(cleaned_audio, len(audio))
-    logging.debug("Ruído atenuado por subtração espectral simples")
-    return cleaned_audio
+    return librosa.util.fix_length(cleaned_audio, size=len(audio))
 
 
 def resample_audio(audio: np.ndarray, orig_sr: int, target_sr: int) -> Tuple[np.ndarray, int]:

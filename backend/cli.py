@@ -71,7 +71,7 @@ def run_cli(controller: PipelineController) -> None:
         return
 
     result = controller.process_audio_file(
-        audio_file=audio_path,
+        audio_path=audio_path,
         meeting_name=meeting_label,
         export_results=export_results,
     )
