@@ -63,8 +63,11 @@ class TranscriptionPipeline:
         stage_timings["export_seconds"] = 0.0
         if export_results:
             t0 = time.perf_counter()
+            timed_transcript = TranscriptionService.format_transcript_with_timestamps(
+                transcription.segments
+            )
             transcript_exports = self.export_service.export_transcript(
-                transcription.text,
+                timed_transcript,
                 transcription.transcript_path,
                 transcription.metadata,
             )

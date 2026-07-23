@@ -76,16 +76,41 @@ class ExportService:
         y_position -= 18
 
         pdf_canvas.setFont("Helvetica", 11)
+        max_width = width - (2 * margin)
         for line in body_text.split("\n"):
-            if y_position <= margin:
-                pdf_canvas.showPage()
-                y_position = height - margin
-                pdf_canvas.setFont("Helvetica", 11)
-            pdf_canvas.drawString(margin, y_position, line)
-            y_position -= 16
+            wrapped = self._wrap_line(line, max_width, pdf_canvas, "Helvetica", 11)
+            for chunk in wrapped:
+                if y_position <= margin:
+                    pdf_canvas.showPage()
+                    y_position = height - margin
+                    pdf_canvas.setFont("Helvetica", 11)
+                pdf_canvas.drawString(margin, y_position, chunk)
+                y_position -= 14
 
         pdf_canvas.save()
         logging.info("PDF finalizado em %s", path)
+
+    @staticmethod
+    def _wrap_line(
+        text: str, max_width: float, pdf_canvas, font_name: str, font_size: int
+    ) -> List[str]:
+        """Wraps a single line of text to fit the PDF page width."""
+        if not text:
+            return [""]
+        words = text.split(" ")
+        lines: List[str] = []
+        current = ""
+        for word in words:
+            candidate = word if not current else f"{current} {word}"
+            if pdf_canvas.stringWidth(candidate, font_name, font_size) <= max_width:
+                current = candidate
+                continue
+            if current:
+                lines.append(current)
+            current = word
+        if current:
+            lines.append(current)
+        return lines or [""]
 
     def _format_summary_for_pdf(self, summary: Dict[str, List[str]]) -> str:
         """Formats structured summary sections into printable text."""

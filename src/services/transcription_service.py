@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import re
 from dataclasses import dataclass
@@ -53,12 +54,14 @@ class TranscriptionService:
         transcript_text = " ".join(
             segment["text"] for segment in segments
         ).strip()
+        timed_transcript = self.format_transcript_with_timestamps(segments)
         timestamp = datetime.utcnow().strftime(
             self.config.transcripts_timestamp_format
         )
         transcript_path = self._save_transcript(
-            transcript_text, meeting_name, timestamp
+            timed_transcript, meeting_name, timestamp
         )
+        self._save_segments(segments, meeting_name, timestamp)
         metadata = {
             "duration_seconds": getattr(info, "duration", None),
             "language": getattr(info, "language", "pt"),
@@ -79,7 +82,7 @@ class TranscriptionService:
         )
 
     def _save_transcript(self, text: str, meeting_name: str, timestamp: str) -> Path:
-        """Saves the raw transcript to disk and returns the path."""
+        """Saves the timed transcript to disk and returns the path."""
         safe_name = self._slugify(meeting_name)
         filename = f"{safe_name}_{timestamp}.txt"
         destination = self.config.transcripts_dir / filename
@@ -87,6 +90,43 @@ class TranscriptionService:
         destination.write_text(text, encoding="utf-8")
         logging.info("Transcrição salva em %s", destination)
         return destination
+
+    def _save_segments(
+        self, segments: List[Dict[str, Any]], meeting_name: str, timestamp: str
+    ) -> Path:
+        """Persists raw segments with timestamps as JSON for later reuse."""
+        safe_name = self._slugify(meeting_name)
+        destination = self.config.transcripts_dir / f"{safe_name}_{timestamp}_segments.json"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(
+            json.dumps(segments, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        logging.info("Segmentos salvos em %s", destination)
+        return destination
+
+    @staticmethod
+    def format_timestamp(seconds: float) -> str:
+        """Formats seconds as HH:MM:SS for transcript lines."""
+        total = int(max(0.0, float(seconds)))
+        hours, remainder = divmod(total, 3600)
+        minutes, secs = divmod(remainder, 60)
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
+    @classmethod
+    def format_transcript_with_timestamps(
+        cls, segments: List[Dict[str, Any]]
+    ) -> str:
+        """Builds a line-per-segment transcript with start/end times."""
+        lines: List[str] = []
+        for segment in segments:
+            start = cls.format_timestamp(segment.get("start", 0.0))
+            end = cls.format_timestamp(segment.get("end", 0.0))
+            text = str(segment.get("text", "")).strip()
+            if not text:
+                continue
+            lines.append(f"[{start} --> {end}] {text}")
+        return "\n".join(lines)
 
     @staticmethod
     def _slugify(value: str) -> str:
