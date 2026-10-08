@@ -119,8 +119,9 @@ por nervosismo. Não comece com "bom, então…".
 
 ## Slide 4 · Metodologia — pipeline (3:15 – 6:00)
 
-**Este é o slide central.** Use o diagrama de fluxo na parte inferior como trilho: aponte
-para o chevron de que está falando.
+**Este é o slide central.** Use a **Figura 1** (fluxo horizontal, na parte inferior) como trilho:
+aponte com a mão o estágio de que está falando. A figura carrega o fluxo; o texto carrega os
+parâmetros. Não leia os dois.
 
 **Ancoragem (15 s):** "A ideia metodológica é ir do sinal sonoro ao texto, do texto a
 tópicos, e de tópicos à decisão. Cada etapa tem uma responsabilidade só, e uma saída bem
@@ -132,7 +133,7 @@ definida para a próxima."
 | 2. Transcrição | 0:40 | "Uso o Whisper via faster-whisper, com busca em feixe de largura 5 — custa mais tempo, mas reduz erro. O filtro de atividade de voz evita que o modelo invente texto em trechos de silêncio, e fixar o idioma em português evita troca espúria de idioma no meio da reunião. A saída preserva o tempo de início e fim de cada segmento." |
 | 3. Embeddings | 0:35 | "A transcrição vira uma sequência de tokens, que eu reorganizo em janelas de 500 com sobreposição de 50. A sobreposição existe para não cortar uma ideia ao meio. Cada janela vira um vetor normalizado." |
 | 4. Agrupamento | 0:35 | "Comparo cada janela com os blocos já formados por similaridade de cosseno. Acima de 0,78, funde; abaixo, abre um bloco novo. É uma estratégia incremental e gulosa — decisão consciente, e eu volto nela nas limitações." |
-| 5. Sumarização | 0:25 | "O resumo não é livre: para cada bloco eu faço três perguntas fixas — que decisões foram tomadas, o que ficou pendente, quais os próximos passos — e o modelo responde sobre aquele contexto." |
+| 5. Sumarização | 0:30 | "O resumo não é livre: três perguntas fixas por bloco — decisões, pendências, próximos passos. E o sumarizador é **configurável**: T5 local ou API externa. Essa escolha troca privacidade por qualidade, e eu volto a ela na conclusão." |
 
 **Se o tempo apertar:** resuma as etapas 1 e 5 em uma frase cada e preserve 3 e 4 — é
 ali que está a contribuição técnica do trabalho.
@@ -144,7 +145,8 @@ ali que está a contribuição técnica do trabalho.
 **Mensagem única:** *"As decisões de arquitetura foram tomadas para que o experimento
 fosse reprodutível."* Não fale de código — fale de método.
 
-- **Camadas (0:25).** "O núcleo de inteligência artificial não sabe que existe interface.
+- **Figura 2 (0:10).** "Estas são as quatro camadas funcionais do sistema." Aponte os quatro títulos; o detalhe interno é material de pôster, não de projeção — não tente lê-lo em voz alta.
+- **Camadas (0:20).** "O núcleo de inteligência artificial não sabe que existe interface.
   Isso não é organização de pastas: é o que permite testar e reutilizar o núcleo isoladamente."
 - **Configuração externalizada (0:30).** *Argumento mais forte deste slide.* "Modelo,
   tamanho de janela, limiar, limites — tudo é variável de ambiente. Isso significa que uma
@@ -209,8 +211,11 @@ tente rodar o pipeline ao vivo.
   estruturada e rastreável. No nível de qualidade do resumo, foi atingido parcialmente — e
   eu sei exatamente onde está o limite."
 - **Contribuição (0:25).** "Dois diferenciais, e eu quero deixá-los explícitos:
-  **auditabilidade** — cada item do resumo volta ao minuto do áudio; e **privacidade** —
-  o áudio não sai da máquina."
+  **auditabilidade** — cada item do resumo volta ao minuto do áudio; e **privacidade
+  configurável** — no modo local nada sai da máquina, e usar uma API externa passa a ser
+  uma decisão explícita."
+  ⚠️ Não diga "o áudio nunca sai da máquina" de forma absoluta: a Figura 1 mostra a opção
+  de API externa, e um avaliador atento pode cobrar a contradição.
 - **Aprendizados (0:15).** "Separar o núcleo das interfaces evitou retrabalho; medir por
   etapa mostrou onde o custo estava de verdade."
 - **Trabalhos futuros (0:20).** Não dê o mesmo peso aos quatro. "A prioridade é um
@@ -258,7 +263,18 @@ limitação do sumarizador (slide 7) e a frase de encerramento (slide 8).
 
 ## Banco de perguntas prováveis
 
-**1. Por que Whisper e não um serviço comercial de transcrição?**
+**1. A Figura 1 mostra um banco vetorial. Qual vocês usam?**
+> Nenhum, ainda. A figura representa o desenho da arquitetura; na implementação atual os vetores
+> ficam em memória e o agrupamento é feito em NumPy, com os segmentos persistidos em JSON. O índice
+> vetorial é o caminho previsto para escalar a busca quando o volume de reuniões crescer.
+
+**2. Então o áudio sai ou não sai da máquina?**
+> Depende da configuração, e isso é explícito no projeto. Com o sumarizador local, que é o modo
+> padrão, nada sai da máquina. Se eu trocar por uma API externa, ganho qualidade de resumo e perco
+> essa garantia. O ponto do trabalho é que essa troca seja uma decisão consciente de quem implanta,
+> e não um efeito colateral invisível da ferramenta.
+
+**3. Por que Whisper e não um serviço comercial de transcrição?**
 > Três razões: o Whisper roda localmente, o que atende ao requisito de privacidade do
 > projeto; tem desempenho documentado em português; e é auditável — eu consigo inspecionar
 > e variar os parâmetros de decodificação, o que um serviço fechado não permite. A

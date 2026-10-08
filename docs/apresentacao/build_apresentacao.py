@@ -37,6 +37,7 @@ BODY_LEFT = Inches(0.55)
 BODY_TOP = Inches(1.10)
 BODY_WIDTH = Inches(10.45)
 BODY_HEIGHT = Inches(5.25)
+FIG_DIR = Path(__file__).resolve().parent / "figuras"
 CONTENT_TOP = Inches(1.62)   # abaixo do subtítulo de seção
 
 
@@ -345,75 +346,91 @@ Transição: "Para chegar a isso, estruturei o trabalho como engenharia de pipel
 
     # ---------------------------------------------------------------- slide 4
     set_title(s[3], "METODOLOGIA", 24)
-    tf = add_box(s[3], BODY_LEFT, BODY_TOP, BODY_WIDTH, Inches(0.42))
+    tf = add_box(s[3], BODY_LEFT, Inches(1.02), BODY_WIDTH, Inches(0.40))
     write(tf, [("h", "Arquitetura do pipeline — cinco estágios encadeados")])
-    tf = add_box(s[3], BODY_LEFT, CONTENT_TOP, BODY_WIDTH, Inches(4.75))
+
+    tf = add_box(s[3], BODY_LEFT, Inches(1.50), BODY_WIDTH, Inches(3.15))
     write(tf, [
-        ("p", "Abordagem de pesquisa aplicada e experimental: o problema é decomposto em etapas com "
-              "responsabilidade única e saída bem definida para a etapa seguinte."),
-        ("b", "1.  Pré-processamento do áudio (librosa) — remoção de silêncio nas extremidades (top_db = 25), "
-              "normalização de pico, subtração espectral em blocos de 60 s e reamostragem para 16 kHz mono."),
-        ("b", "2.  Transcrição / ASR (faster-whisper) — decodificação por feixe (beam_size = 5), filtro de "
-              "atividade de voz (VAD) e idioma fixado em pt; saída segmentada com marcação temporal."),
-        ("b", "3.  Estruturação semântica (Sentence-BERT) — tokenização e reorganização em janelas "
-              "deslizantes de 500 tokens com sobreposição de 50; cada janela vira um vetor normalizado em L2."),
-        ("b", "4.  Agrupamento temático — similaridade de cosseno contra limiar de 0,78, com fusão incremental "
-              "gulosa e atualização do centroide; cada bloco é remapeado ao eixo temporal da reunião."),
-        ("b", "5.  Sumarização (T5) — instruções em linguagem natural por seção (decisões / pendências / "
-              "próximos passos), com corte controlado de contexto, somadas a uma visão geral da transcrição."),
-        ("n", "Exportação: transcrição em TXT e PDF; resumo estruturado em PDF e JSON."),
+        ("b", "1.  Pré-processamento do áudio (librosa) — remoção de silêncio nas extremidades "
+              "(top_db = 25), normalização de pico, subtração espectral em blocos de 60 s e "
+              "reamostragem para 16 kHz mono."),
+        ("b", "2.  Transcrição / ASR (faster-whisper) — decodificação por feixe (beam_size = 5), "
+              "filtro de atividade de voz (VAD) e idioma fixado em pt; saída segmentada com "
+              "marcação temporal."),
+        ("b", "3.  Estruturação semântica (Sentence-BERT) — janelas deslizantes de 500 tokens com "
+              "sobreposição de 50; cada janela vira um vetor normalizado em L2."),
+        ("b", "4.  Agrupamento temático — similaridade de cosseno contra limiar de 0,78, com fusão "
+              "incremental gulosa; cada bloco é remapeado ao eixo temporal da reunião."),
+        ("b", "5.  Sumarização (T5-small local, ou API externa por configuração) — três instruções "
+              "fixas: decisões, pendências e próximos passos, mais uma visão geral."),
     ])
-    add_pipeline_diagram(s[3], Inches(0.62), Inches(5.62), [
-        ("Áudio da\nreunião", False),
-        ("Pré-\nprocessamento", False),
-        ("Transcrição\nWhisper (ASR)", True),
-        ("Embeddings\nSentence-BERT", True),
-        ("Agrupamento\npor cosseno", True),
-        ("Resumo T5\n+ exportação", False),
-    ])
+
+    s[3].shapes.add_picture(
+        str(FIG_DIR / "pipeline_horizontal.png"),
+        BODY_LEFT, Inches(4.78), width=Inches(10.45),
+    )
+    tf = add_box(s[3], BODY_LEFT, Inches(6.28), BODY_WIDTH, Inches(0.32))
+    write(tf, [("n", "Figura 1 — Fluxo de ponta a ponta do pipeline.")])
+
     notes(s[3], """
-METODOLOGIA – PIPELINE (3:15–6:00). Este é o slide central: ande pelas cinco caixas.
+METODOLOGIA – PIPELINE (3:15–6:00). Este é o slide central: ande pelas cinco etapas.
 Ancoragem: "A ideia é ir do sinal sonoro ao texto, do texto a tópicos, e de tópicos à decisão."
-1) Pré-processamento (30s): justifique — lixo entra, lixo sai. A subtração espectral em blocos de
-   60 s foi necessária porque gravações longas estouravam a memória.
-2) ASR (40s): beam search custa mais tempo, mas reduz erro; VAD evita alucinação em silêncio;
+Aponte a Figura 1 com a mão enquanto percorre os estágios — ela carrega o fluxo, e o texto
+carrega os parâmetros. Não leia os dois.
+1) Pré-processamento (30s): lixo entra, lixo sai. Blocos de 60 s porque gravações longas
+   estouravam a memória.
+2) ASR (40s): beam search custa tempo mas reduz erro; VAD evita alucinação em silêncio;
    fixar pt evita troca espúria de idioma.
-3) Embeddings (35s): explique a janela deslizante — a sobreposição evita cortar uma ideia ao meio.
-4) Agrupamento (35s): cosseno com limiar 0,78; é guloso, decisão consciente (volta nas limitações).
-5) Sumarização (30s): o resumo não é livre, é guiado por três perguntas fixas.
+3) Embeddings (35s): a sobreposição evita cortar uma ideia ao meio.
+4) Agrupamento (35s): cosseno com limiar 0,78; guloso, decisão consciente (volta nas limitações).
+5) Sumarização (30s): o resumo não é livre, é guiado por três perguntas fixas. O sumarizador é
+   CONFIGURÁVEL: T5 local, ou API externa — e essa escolha troca privacidade por qualidade.
+>>> RESSALVA sobre a Figura 1: a caixa "Armazenar no Vetor DB" representa o desenho da arquitetura,
+    não a implementação atual. No código os blocos e embeddings ficam em memória e os segmentos são
+    persistidos em JSON em disco — não há banco vetorial. Se perguntarem qual banco vetorial você usa,
+    responda: "nenhum ainda; o agrupamento é feito em NumPy sobre os vetores em memória, e o índice
+    vetorial é o caminho previsto para escalar a busca."
 Se o tempo apertar, resuma 1 e 5 e preserve 3 e 4 — é onde está a contribuição técnica.
 """)
 
     # ---------------------------------------------------------------- slide 5
     set_title(s[4], "METODOLOGIA", 24)
-    tf = add_box(s[4], BODY_LEFT, BODY_TOP, BODY_WIDTH, Inches(0.42))
-    write(tf, [("h", "Decisões de projeto, reprodutibilidade e verificação")])
-    tf = add_box(s[4], BODY_LEFT, CONTENT_TOP, BODY_WIDTH, Inches(4.75))
+    tf = add_box(s[4], BODY_LEFT, Inches(1.02), BODY_WIDTH, Inches(0.40))
+    write(tf, [("h", "Arquitetura em camadas, reprodutibilidade e verificação")])
+
+    s[4].shapes.add_picture(
+        str(FIG_DIR / "arquitetura_camadas.png"),
+        BODY_LEFT, Inches(1.44), height=Inches(4.92),
+    )
+    tf = add_box(s[4], BODY_LEFT, Inches(6.40), Inches(4.30), Inches(0.30))
+    write(tf, [("n", "Figura 2 — As quatro camadas funcionais.")])
+
+    tf = add_box(s[4], Inches(4.92), Inches(1.46), Inches(6.08), Inches(4.90))
     write(tf, [
         ("b", "Arquitetura em camadas — o núcleo de IA (src/) é independente das camadas de uso "
-              "(backend/): linha de comando, API FastAPI, painel Streamlit e front-end Next.js."),
-        ("s", "Consequência metodológica: o núcleo pode ser testado e reutilizado sem subir interface."),
-        ("b", "Configuração externalizada — modelo de ASR, modelo de embeddings, sumarizador, tamanho de "
-              "janela, sobreposição, limiar de similaridade e limites de upload são variáveis de ambiente."),
-        ("s", "Consequência metodológica: um experimento é descrito por um conjunto de variáveis, "
-              "não por uma alteração de código — o que torna a rodada reprodutível."),
-        ("b", "Instrumentação — toda execução devolve stage_timings: tempo de pré-processamento, "
-              "transcrição, análise semântica, sumarização, exportação e tempo total de parede."),
-        ("b", "Verificação — suíte automatizada em pytest com dublês de modelos: 15 testes em 6 módulos "
-              "cobrindo transcrição, embeddings, sumarização, validação de upload, API e integração."),
-        ("b", "Protocolo experimental — 2 a 4 cenários de áudio com perfis distintos: curto e limpo; "
-              "médio com múltiplos falantes; com ruído de fundo; com silêncio inicial prolongado."),
-        ("s", "Para cada cenário registram-se configuração, métricas automáticas e checklist qualitativo."),
+              "(linha de comando, API FastAPI, painel Streamlit, front-end Next.js) e pode ser "
+              "testado sem subir interface."),
+        ("b", "Configuração externalizada — modelo de ASR, embeddings, sumarizador, tamanho de "
+              "janela, sobreposição e limiar de similaridade são variáveis de ambiente: uma rodada "
+              "experimental é descrita por variáveis, não por alteração de código."),
+        ("b", "Instrumentação — toda execução devolve stage_timings, com o tempo de cada etapa do "
+              "pipeline e o tempo total de parede."),
+        ("b", "Verificação — suíte automatizada em pytest com dublês de modelos: 15 testes em 6 "
+              "módulos, cobrindo transcrição, embeddings, sumarização, upload, API e integração."),
+        ("b", "Protocolo experimental — 2 a 4 cenários de áudio com perfis distintos; cada perfil "
+              "estressa uma etapa diferente do pipeline."),
     ])
+
     notes(s[4], """
 METODOLOGIA – RIGOR (6:00–7:45). Aqui você mostra método, não código.
 Mensagem única: "As decisões de arquitetura foram tomadas para que o experimento fosse reprodutível."
-1) Camadas (25s): o núcleo não sabe que existe uma interface.
-2) Configuração externalizada (30s): este é o argumento mais forte de rigor — uma rodada é descrita
-   por variáveis de ambiente, então outro pesquisador reproduz sem tocar no código.
+A Figura 2 mostra as quatro camadas; use-a para dizer que o núcleo não sabe que existe interface.
+1) Camadas (25s): o núcleo é independente das formas de acionamento.
+2) Configuração externalizada (30s): argumento mais forte de rigor — outro pesquisador reproduz
+   a rodada sem tocar no código.
 3) Instrumentação (25s): sem medir por etapa não se sabe onde está o custo.
 4) Testes (20s): dublês de modelos permitem testar a lógica sem baixar modelos pesados.
-5) Protocolo (20s): os quatro perfis de áudio não são arbitrários — cada um estressa uma etapa.
+5) Protocolo (20s): os perfis de áudio não são arbitrários — cada um estressa uma etapa.
 """)
 
     # ---------------------------------------------------------------- slide 6
@@ -521,7 +538,8 @@ RESULTADOS – PARTE 2 (10:05–12:00).
               "com instrumentação de desempenho em todas as etapas."),
         ("h", "Contribuição"),
         ("b", "Uma arquitetura de referência aberta e modular que integra ASR, estruturação semântica e "
-              "sumarização, executável localmente — sem enviar o áudio da reunião a terceiros."),
+              "sumarização, com privacidade configurável: no modo local o áudio e o texto não "
+              "saem da máquina; recorrer a uma API externa é uma decisão explícita de configuração."),
         ("b", "Um protocolo de avaliação e ferramentas de medição que permitem comparar configurações de "
               "forma reprodutível, e não apenas relatar uma execução isolada."),
         ("h", "Aprendizados"),
@@ -537,7 +555,9 @@ RESULTADOS – PARTE 2 (10:05–12:00).
 CONSIDERAÇÕES FINAIS (12:00–13:30). Feche o arco: retome o objetivo do slide 3.
 1) Conclusão (30s): responda explicitamente "o objetivo foi atingido?" — e qualifique: no nível de
    sistema sim; no nível de qualidade do resumo, parcialmente.
-2) Contribuição (25s): auditabilidade e privacidade são os dois diferenciais. Diga isso em voz alta.
+2) Contribuição (25s): auditabilidade e privacidade CONFIGURÁVEL são os dois diferenciais.
+   Cuidado: não diga "o áudio nunca sai da máquina" de forma absoluta — diga que o modo local
+   mantém tudo na máquina e que usar API externa é uma escolha explícita de configuração.
 3) Aprendizados (20s): mostra maturidade de engenharia.
 4) Trabalhos futuros (25s): não liste os quatro com o mesmo peso — destaque o sumarizador em
    português como a próxima prioridade, porque é o gargalo que você identificou nos resultados.
