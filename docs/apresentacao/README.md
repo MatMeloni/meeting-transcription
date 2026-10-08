@@ -10,6 +10,7 @@ Reuniões Utilizando Inteligência Artificial**.
 | [`APRESENTACAO_JIC_2026_Meloni.pdf`](APRESENTACAO_JIC_2026_Meloni.pdf) | Mesmo deck em PDF (cópia de segurança para o dia) |
 | [`02_PROMPT_GAMMA.md`](02_PROMPT_GAMMA.md) | Prompt para gerar a versão alternativa no [gamma.app](https://gamma.app) e critérios de comparação |
 | [`03_ROTEIRO_APRESENTACAO.md`](03_ROTEIRO_APRESENTACAO.md) | **Roteiro de fala** cronometrado (15 min), plano de corte e banco de perguntas com respostas |
+| [`04_FALAS_EM_SEQUENCIA.docx`](04_FALAS_EM_SEQUENCIA.docx) | **Texto corrido de todas as falas**, do primeiro ao último slide, com rubricas de palco e anexo de arguição — 1.827 palavras, ~14 min a 130 palavras/min |
 | [`build_apresentacao.py`](build_apresentacao.py) | Script `python-pptx` que regenera o deck a partir do template |
 | `template/` | Templates oficiais enviados pelo CFP (pesquisa de campo e revisão bibliográfica) |
 

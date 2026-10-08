@@ -11,9 +11,15 @@
 | **Local** | Sala 402 — Campus Higienópolis |
 | **Tempo** | 15 minutos, sem possibilidade de remarcação |
 | **Deck** | `APRESENTACAO_JIC_2026_Meloni.pptx` (10 slides, com notas do apresentador) |
+| **Falas** | `04_FALAS_EM_SEQUENCIA.docx` — texto corrido de tudo o que você fala, na ordem |
 
 > As mesmas marcações de tempo estão nas **notas de cada slide** do .pptx — no modo
-> Apresentador você vê o roteiro enquanto a banca vê apenas o slide.
+> Apresentador você vê o roteiro enquanto a banca vê apenas o slide. Este arquivo explica
+> *como* falar; o `04_FALAS_EM_SEQUENCIA.docx` traz *o que* falar, palavra por palavra.
+>
+> O texto completo tem **1.827 palavras**: cerca de **14 minutos** a 130 palavras por minuto,
+> deixando um minuto de folga dentro dos quinze. Se o seu ensaio cronometrado passar de 14:30,
+> o ritmo está lento — não corte conteúdo antes de cronometrar duas vezes.
 
 ---
 
@@ -54,16 +60,16 @@ Três áudios curtos gravados com o seu microfone bastam. Com os modelos em cach
 |-------|-------|----------|------|
 | 1–2 | Capa e identificação | 0:00 | 0:45 |
 | 3 | Introdução | 0:45 | 2:30 |
-| 4 | Metodologia — pipeline | 3:15 | 3:00 |
-| 5 | Metodologia — rigor | 6:15 | 1:45 |
-| 6 | Resultados — entrega | 8:00 | 2:30 |
-| 7 | Resultados — avaliação | 10:30 | 1:30 |
+| 4 | Metodologia — pipeline | 3:15 | 2:45 |
+| 5 | Metodologia — rigor | 6:00 | 1:45 |
+| 6 | Resultados — entrega | 7:45 | 2:20 |
+| 7 | Resultados — avaliação | 10:05 | 1:55 |
 | 8 | Considerações finais | 12:00 | 1:30 |
 | 9 | Referências | 13:30 | 0:15 |
 | 10 | Agradecimentos | 13:45 | 0:15 |
 | — | **Folga / perguntas** | 14:00 | 1:00 |
 
-**Regra de ouro:** se aos **8:00** você ainda não estiver no slide 6, pule o slide 5 e
+**Regra de ouro:** se aos **7:45** você ainda não estiver no slide 6, pule o slide 5 e
 vá direto para resultados. Banca perdoa falta de detalhe de método; não perdoa
 apresentação que estoura o tempo e é interrompida antes da conclusão.
 
@@ -111,7 +117,7 @@ por nervosismo. Não comece com "bom, então…".
 
 ---
 
-## Slide 4 · Metodologia — pipeline (3:15 – 6:15)
+## Slide 4 · Metodologia — pipeline (3:15 – 6:00)
 
 **Este é o slide central.** Use o diagrama de fluxo na parte inferior como trilho: aponte
 para o chevron de que está falando.
@@ -133,7 +139,7 @@ ali que está a contribuição técnica do trabalho.
 
 ---
 
-## Slide 5 · Metodologia — rigor (6:15 – 8:00)
+## Slide 5 · Metodologia — rigor (6:00 – 7:45)
 
 **Mensagem única:** *"As decisões de arquitetura foram tomadas para que o experimento
 fosse reprodutível."* Não fale de código — fale de método.
@@ -154,7 +160,7 @@ fosse reprodutível."* Não fale de código — fale de método.
 
 ---
 
-## Slide 6 · Resultados — entrega funcional (8:00 – 10:30)
+## Slide 6 · Resultados — entrega funcional (7:45 – 10:05)
 
 **Abra com:** "O resultado primário é um sistema que roda de ponta a ponta — e eu consigo
 mostrar a saída dele."
@@ -179,7 +185,7 @@ tente rodar o pipeline ao vivo.
 
 ---
 
-## Slide 7 · Resultados — custo, achado e limitações (10:30 – 12:00)
+## Slide 7 · Resultados — custo, achado e limitações (10:05 – 12:00)
 
 - **Tabela (0:40).** Não leia célula por célula. Aponte duas linhas: a da transcrição e a da
   sumarização. "O que a instrumentação por etapa revelou é que o custo não está distribuído: ele

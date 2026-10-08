@@ -372,7 +372,7 @@ Transição: "Para chegar a isso, estruturei o trabalho como engenharia de pipel
         ("Resumo T5\n+ exportação", False),
     ])
     notes(s[3], """
-METODOLOGIA – PIPELINE (3:15–6:15). Este é o slide central: ande pelas cinco caixas.
+METODOLOGIA – PIPELINE (3:15–6:00). Este é o slide central: ande pelas cinco caixas.
 Ancoragem: "A ideia é ir do sinal sonoro ao texto, do texto a tópicos, e de tópicos à decisão."
 1) Pré-processamento (30s): justifique — lixo entra, lixo sai. A subtração espectral em blocos de
    60 s foi necessária porque gravações longas estouravam a memória.
@@ -406,7 +406,7 @@ Se o tempo apertar, resuma 1 e 5 e preserve 3 e 4 — é onde está a contribui�
         ("s", "Para cada cenário registram-se configuração, métricas automáticas e checklist qualitativo."),
     ])
     notes(s[4], """
-METODOLOGIA – RIGOR (6:15–8:00). Aqui você mostra método, não código.
+METODOLOGIA – RIGOR (6:00–7:45). Aqui você mostra método, não código.
 Mensagem única: "As decisões de arquitetura foram tomadas para que o experimento fosse reprodutível."
 1) Camadas (25s): o núcleo não sabe que existe uma interface.
 2) Configuração externalizada (30s): este é o argumento mais forte de rigor — uma rodada é descrita
@@ -437,7 +437,7 @@ Mensagem única: "As decisões de arquitetura foram tomadas para que o experimen
               "puro, eliminando a dependência de FAISS, sem qualquer alteração nas camadas de interface."),
     ])
     notes(s[5], """
-RESULTADOS – PARTE 1 (8:00–10:30). Mostre entrega, não esforço.
+RESULTADOS – PARTE 1 (7:45–10:05). Mostre entrega, não esforço.
 Abra com: "O resultado primário é um sistema que roda ponta a ponta — e eu consigo mostrar a saída dele."
 1) Três vias de acesso (30s): a mesma lógica servida de três formas comprova o isolamento do núcleo.
 2) Saídas (60s): detalhe-se aqui. A marcação temporal é o que torna o resumo auditável: cada
@@ -491,7 +491,7 @@ Se a banca pedir demonstração, tenha um PDF de saída aberto numa aba.
     ])
 
     notes(s[6], """
-RESULTADOS – PARTE 2 (10:30–12:00).
+RESULTADOS – PARTE 2 (10:05–12:00).
 
 >>> PROCEDÊNCIA DA TABELA — saiba responder se perguntarem:
     . Pré-processamento: MEDIDO, executando a etapa real do pipeline (librosa) sobre sinal de
