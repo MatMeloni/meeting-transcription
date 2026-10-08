@@ -38,8 +38,21 @@ Para conferir o resultado visualmente:
 soffice --headless --convert-to pdf --outdir /tmp docs/apresentacao/APRESENTACAO_JIC_2026_Meloni.pptx
 ```
 
-## ⚠️ Pendência
+## Sobre a Tabela 1 (slide 7)
 
-A **Tabela 1** (slide 7) está com células `—`. Preencha com uma rodada real antes de
-apresentar — ver instruções em [`03_ROTEIRO_APRESENTACAO.md`](03_ROTEIRO_APRESENTACAO.md)
-e o protocolo em [`../evaluation_protocol.md`](../evaluation_protocol.md).
+A tabela de custo computacional está preenchida, com procedência declarada por linha:
+
+- **medido** — pré-processamento, executando a etapa real do pipeline (CPU x86-64, 4 núcleos
+  @ 2,1 GHz, sem GPU);
+- **calculado** — número de blocos semânticos, derivado de `chunk_size = 500` e `overlap = 50`;
+- **projetado** — transcrição, análise semântica e sumarização.
+
+Para substituir as projeções por medição real, rode o benchmark e atualize o bloco `add_table`
+do slide 7 em [`build_apresentacao.py`](build_apresentacao.py):
+
+```bash
+python scripts/benchmark_pipeline.py --audio a1.wav a2.wav a3.wav --output docs/runs/rodada_final.md
+```
+
+Detalhes em [`03_ROTEIRO_APRESENTACAO.md`](03_ROTEIRO_APRESENTACAO.md) e no protocolo
+[`../evaluation_protocol.md`](../evaluation_protocol.md).

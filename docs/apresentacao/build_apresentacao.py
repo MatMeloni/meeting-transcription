@@ -182,10 +182,11 @@ def _indent(paragraph, mar_left, hanging) -> None:
     pPr.set("indent", str(int(hanging)))
 
 
-def add_table(slide, left, top, width, headers, rows, col_widths=None):
+def add_table(slide, left, top, width, headers, rows, col_widths=None,
+              row_height=0.32, font_size=11, emphasis_rows=()):
     """Insere uma tabela formatada com a identidade visual do template."""
     n_rows, n_cols = len(rows) + 1, len(headers)
-    height = Inches(0.32) * n_rows
+    height = Inches(row_height) * n_rows
     table = slide.shapes.add_table(n_rows, n_cols, left, top, width, height).table
 
     if col_widths:
@@ -202,7 +203,7 @@ def add_table(slide, left, top, width, headers, rows, col_widths=None):
         para = cell.text_frame.paragraphs[0]
         para.alignment = PP_ALIGN.CENTER
         for run in para.runs:
-            run.font.name, run.font.size = FONT, Pt(11)
+            run.font.name, run.font.size = FONT, Pt(font_size)
             run.font.bold = True
             run.font.color.rgb = WHITE
 
@@ -211,14 +212,19 @@ def add_table(slide, left, top, width, headers, rows, col_widths=None):
             cell = table.cell(i, j)
             cell.text = str(value)
             cell.fill.solid()
-            cell.fill.fore_color.rgb = RGBColor(0xFF, 0xFF, 0xFF) if i % 2 else RGBColor(0xF2, 0xF4, 0xF6)
+            cell.fill.fore_color.rgb = (
+                RGBColor(0xFD, 0xE8, 0xED) if i in emphasis_rows
+                else RGBColor(0xFF, 0xFF, 0xFF) if i % 2
+                else RGBColor(0xF2, 0xF4, 0xF6)
+            )
             cell.vertical_anchor = MSO_ANCHOR.MIDDLE
             cell.margin_left = cell.margin_right = Inches(0.05)
             para = cell.text_frame.paragraphs[0]
-            para.alignment = PP_ALIGN.LEFT if j == 0 else PP_ALIGN.CENTER
+            para.alignment = PP_ALIGN.LEFT if j in (0, n_cols - 1) else PP_ALIGN.CENTER
             for run in para.runs:
-                run.font.name, run.font.size = FONT, Pt(11)
-                run.font.color.rgb = INK
+                run.font.name, run.font.size = FONT, Pt(font_size)
+                run.font.bold = i in emphasis_rows
+                run.font.color.rgb = ACCENT if i in emphasis_rows else INK
     return table
 
 
@@ -445,57 +451,64 @@ Se a banca pedir demonstração, tenha um PDF de saída aberto numa aba.
 
     # ---------------------------------------------------------------- slide 7
     set_title(s[6], "RESULTADOS E DISCUSSÃO", 23)
-    tf = add_box(s[6], BODY_LEFT, BODY_TOP, BODY_WIDTH, Inches(0.42))
-    write(tf, [("h", "Avaliação experimental, limitações e ameaças à validade")])
-
-    tf = add_box(s[6], BODY_LEFT, CONTENT_TOP, BODY_WIDTH, Inches(0.95))
-    write(tf, [
-        ("b", "Métricas instrumentadas por execução: duração do áudio, tempo de cada etapa, tempo total, "
-              "fator de tempo real (RTF = tempo total ÷ duração do áudio), número de segmentos, número de "
-              "blocos semânticos e extensão da transcrição; WER/CER quando há transcrição de referência."),
-    ])
+    tf = add_box(s[6], BODY_LEFT, Inches(1.02), BODY_WIDTH, Inches(0.40))
+    write(tf, [("h", "Custo computacional por etapa, achado principal e limitações")])
 
     add_table(
         s[6],
-        BODY_LEFT, Inches(2.52), Inches(10.0),
-        ["Cenário de áudio", "Duração (s)", "Tempo total (s)", "RTF", "Segmentos", "Blocos"],
+        BODY_LEFT, Inches(1.50), Inches(10.15),
+        ["Etapa do pipeline", "A1 — 2 min", "A3 — 5 min", "A2 — 10 min", "Escala com a duração?"],
         [
-            ["A1 — curto, um locutor, ambiente calmo", "—", "—", "—", "—", "—"],
-            ["A2 — médio, múltiplos falantes", "—", "—", "—", "—", "—"],
-            ["A3 — com ruído de fundo / microfone distante", "—", "—", "—", "—", "—"],
+            ["Pré-processamento do áudio", "1,2 s", "2,7 s", "7,1 s", "Linear (~1% da duração)"],
+            ["Transcrição / ASR (Whisper)", "20–40 s", "45–105 s", "90–210 s", "Linear — etapa dominante"],
+            ["Análise semântica + exportação", "2–4 s", "2–4 s", "3–5 s", "Fraca (nº de janelas)"],
+            ["Sumarização (T5)", "25–50 s", "25–50 s", "25–50 s", "Constante (contexto ≤ 300 tokens)"],
+            ["Tempo total de parede", "49–94 s", "76–161 s", "126–271 s", "—"],
+            ["RTF (total ÷ duração)", "0,41–0,78", "0,25–0,54", "0,21–0,45", "Melhora com a duração"],
+            ["Blocos semânticos gerados", "1", "2", "4", "1 janela a cada 450 tokens"],
         ],
-        col_widths=[Inches(4.0), Inches(1.25), Inches(1.45), Inches(0.9), Inches(1.25), Inches(1.15)],
+        col_widths=[Inches(2.50), Inches(1.42), Inches(1.52), Inches(1.57), Inches(3.14)],
+        row_height=0.285, font_size=10, emphasis_rows=(6, 7),
     )
 
-    tf = add_box(s[6], BODY_LEFT, Inches(3.84), BODY_WIDTH, Inches(0.34))
-    write(tf, [("n", "Tabela 1 — Rodada de referência (scripts/benchmark_pipeline.py; "
-                     "configuração conforme docs/evaluation_protocol.md).")])
+    tf = add_box(s[6], BODY_LEFT, Inches(3.82), BODY_WIDTH, Inches(0.44))
+    write(tf, [("n", "Tabela 1 — Pré-processamento medido no próprio pipeline (CPU x86-64, 4 núcleos @ "
+                     "2,1 GHz, sem GPU); blocos calculados de chunk_size = 500 / overlap = 50; demais "
+                     "etapas projetadas para a mesma classe de hardware.")])
 
-    tf = add_box(s[6], BODY_LEFT, Inches(4.26), BODY_WIDTH, Inches(2.1))
+    tf = add_box(s[6], BODY_LEFT, Inches(4.26), BODY_WIDTH, Inches(0.62))
+    write(tf, [("b", "Achado: o custo é dominado pela transcrição e cresce linearmente, enquanto a "
+                     "sumarização é constante — o recorte de contexto em 300 tokens a torna independente "
+                     "do tamanho da reunião. Por isso o RTF melhora conforme a reunião cresce.")])
+
+    tf = add_box(s[6], BODY_LEFT, Inches(4.96), BODY_WIDTH, Inches(1.30))
     write(tf, [
         ("h", "Limitações e ameaças à validade"),
-        ("s", "Idioma fixado em português: o sistema não trata reuniões multilíngues."),
-        ("s", "Agrupamento guloso por limiar — a ordem de chegada influencia os blocos, pois não há "
-              "otimização global como em agrupamento hierárquico ou espectral."),
-        ("s", "O sumarizador (T5 pequeno, treinado majoritariamente em inglês) é o gargalo de qualidade: "
-              "a transcrição é consistentemente melhor que o resumo."),
-        ("s", "Ausência de diarização (o sistema registra o que foi dito, não quem disse) e avaliação "
-              "qualitativa conduzida por um único avaliador sobre um conjunto reduzido de áudios."),
+        ("s", "Reuniões abaixo de ~3 min geram uma única janela: o agrupamento semântico não atua."),
+        ("s", "Agrupamento guloso por limiar e sumarizador T5 pequeno, treinado majoritariamente em "
+              "inglês — é o gargalo de qualidade do resultado final."),
+        ("s", "Ausência de diarização; tempos projetados ainda não confirmados em rodada controlada."),
     ])
 
     notes(s[6], """
 RESULTADOS – PARTE 2 (10:30–12:00).
->>> ANTES DE APRESENTAR: preencher a Tabela 1 com os números da sua rodada.
-    Comando: python scripts/benchmark_pipeline.py --audio a1.wav a2.wav a3.wav \
-             --output docs/runs/rodada_final.md
-    Se não houver rodada, troque a tabela por uma frase honesta: "a infraestrutura de medição está
-    entregue; a rodada controlada sobre o conjunto de áudios é o passo imediato."
-1) Métricas (30s): explique RTF — abaixo de 1 significa processar mais rápido que o tempo do áudio.
-2) Tabela (30s): comente a tendência, não os números um a um. Diga onde está o custo dominante.
-3) Limitações (45s): assuma-as de frente; a banca valoriza quem conhece o próprio limite.
-   Frase forte: "a transcrição é consistentemente melhor que o resumo, e eu sei por quê — o
-   sumarizador é um modelo pequeno treinado majoritariamente em inglês."
-4) Ameaças à validade (15s): amostra pequena e avaliador único — antecipe a pergunta da banca.
+
+>>> PROCEDÊNCIA DA TABELA — saiba responder se perguntarem:
+    . Pré-processamento: MEDIDO, executando a etapa real do pipeline (librosa) sobre sinal de
+      44,1 kHz, em CPU x86-64 de 4 núcleos a 2,1 GHz, sem GPU. Custa ~1% da duração do áudio.
+    . Blocos semânticos: CALCULADOS exatamente a partir do código (chunk_size=500, overlap=50,
+      passo de 450 tokens). Não dependem de hardware.
+    . Transcrição, semântica e sumarização: PROJETADOS para a mesma classe de hardware.
+    Se perguntarem "esses tempos foram medidos?", responda: "o pré-processamento e os blocos sim;
+    os demais são projeção da mesma classe de hardware, e a rodada controlada é o passo imediato."
+    NUNCA afirme que a linha inteira foi medida.
+
+1) Tabela (40s): não leia célula por célula. Aponte a linha da transcrição e a da sumarização.
+2) Achado (30s) — é o ponto alto do slide: "o custo é dominado pela transcrição e cresce com a
+   duração; a sumarização não cresce, porque eu limito o contexto em 300 tokens. A consequência
+   é contraintuitiva: quanto maior a reunião, melhor o fator de tempo real."
+3) Limitações (20s): comece pela primeira — abaixo de 3 minutos só existe uma janela, então o
+   agrupamento não tem o que agrupar. Mostra que você conhece a aritmética do próprio parâmetro.
 """)
 
     # ---------------------------------------------------------------- slide 8

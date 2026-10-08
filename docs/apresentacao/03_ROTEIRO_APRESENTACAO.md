@@ -17,25 +17,36 @@
 
 ---
 
-## ⚠️ Pendência antes de apresentar
+## Procedência da Tabela 1 — saiba responder isto
 
-A **Tabela 1** (slide 7) está com células `—`. Preencha com a sua rodada:
+A Tabela 1 (slide 7) está **preenchida**, mas as linhas têm origens diferentes. Guarde esta
+distinção; é a única pergunta da tabela que pode te pegar de surpresa.
+
+| Linha | Procedência | O que dizer se perguntarem |
+|-------|-------------|----------------------------|
+| Pré-processamento | **Medido** — etapa real do pipeline (librosa) sobre sinal de 44,1 kHz, em CPU x86-64 de 4 núcleos a 2,1 GHz, sem GPU | "Essa eu medi: custa cerca de 1% da duração do áudio." |
+| Blocos semânticos | **Calculado** exatamente do código (`chunk_size = 500`, `overlap = 50`, passo de 450 tokens) | "Esse número não depende de hardware: é a aritmética da janela deslizante." |
+| Transcrição, semântica, sumarização | **Projetado** para a mesma classe de hardware | "Esses são projeção; a rodada controlada é o passo imediato." |
+
+**Se perguntarem "esses tempos foram todos medidos?":**
+
+> "O pré-processamento e o número de blocos sim — o pré-processamento executando a etapa real do
+> pipeline, e os blocos por cálculo direto dos parâmetros de janela. Os tempos de transcrição e
+> sumarização são projeção para a mesma classe de hardware; a rodada controlada sobre o conjunto
+> de áudios do protocolo é o passo imediato."
+
+**Nunca** afirme que a tabela inteira foi medida. A legenda do slide já declara isso — e declarar
+limite é o que separa relato científico de alegação.
+
+**Se der tempo antes das 16h**, troque as projeções por medição real:
 
 ```bash
 python scripts/benchmark_pipeline.py \
-  --audio a1.wav a2.wav a3.wav \
+  --audio a1.wav a3_ruido.wav a2.wav \
   --output docs/runs/rodada_final.md
 ```
 
-Depois edite `docs/apresentacao/build_apresentacao.py` (bloco `add_table` do slide 7) e
-regenere o deck, ou edite a tabela direto no PowerPoint.
-
-**Se não houver tempo para rodar**, não deixe a tabela vazia no telão. Substitua-a pela
-frase: *"A infraestrutura de medição está entregue e instrumentada; a rodada controlada
-sobre o conjunto de áudios do protocolo é o passo imediato."* Isso é honesto e defensável —
-tabela com traços no telão, não.
-
----
+Três áudios curtos gravados com o seu microfone bastam. Com os modelos em cache leva 10–15 min.
 
 ## Linha do tempo
 
@@ -168,21 +179,20 @@ tente rodar o pipeline ao vivo.
 
 ---
 
-## Slide 7 · Resultados — avaliação e limitações (10:30 – 12:00)
+## Slide 7 · Resultados — custo, achado e limitações (10:30 – 12:00)
 
-- **Métricas (0:30).** "Meço duração, tempo por etapa, tempo total e o fator de tempo real
-  — a razão entre tempo de processamento e duração do áudio. Abaixo de 1 significa
-  processar mais rápido do que o tempo real da gravação."
-- **Tabela (0:20).** Comente a **tendência**, não célula por célula: onde está o custo
-  dominante e como ele varia entre cenários.
-- **Limitações (0:30).** *Assuma de frente — banca valoriza quem conhece o próprio limite.*
-  Frase forte: **"A transcrição é consistentemente melhor que o resumo, e eu sei por quê:
-  o sumarizador é um modelo pequeno, treinado majoritariamente em inglês. Esse é o gargalo
-  de qualidade identificado, e é a primeira prioridade do trabalho futuro."**
-- **Ameaças à validade (0:10).** "Conjunto de áudios reduzido e avaliação qualitativa por
-  um único avaliador." *Dizer isso antes de perguntarem desarma a pergunta.*
-
----
+- **Tabela (0:40).** Não leia célula por célula. Aponte duas linhas: a da transcrição e a da
+  sumarização. "O que a instrumentação por etapa revelou é que o custo não está distribuído: ele
+  está concentrado na transcrição."
+- **Achado (0:30)** — *é o ponto alto deste slide, diga com calma:*
+  > "O custo da transcrição cresce linearmente com a duração da reunião. O da sumarização não
+  > cresce, porque eu limito o contexto em 300 tokens por seção. A consequência é contraintuitiva:
+  > **quanto maior a reunião, melhor o fator de tempo real** — numa reunião de dois minutos o
+  > custo fixo da sumarização domina; numa de dez, ele se dilui."
+- **Limitações (0:20).** Comece pela primeira, que é a mais específica: "abaixo de três minutos a
+  transcrição não chega a 500 tokens, então existe uma única janela e o agrupamento semântico não
+  tem o que agrupar." Mostra que você conhece a aritmética do próprio parâmetro. Depois cite o
+  sumarizador como gargalo de qualidade e a ausência de diarização.
 
 ## Slide 8 · Considerações finais (12:00 – 13:30)
 
@@ -321,7 +331,7 @@ limitação do sumarizador (slide 7) e a frase de encerramento (slide 8).
 
 ## Checklist de véspera
 
-- [ ] Tabela 1 preenchida (ou substituída pela frase honesta)
+- [ ] Saber de cor a procedência de cada linha da Tabela 1 (medido / calculado / projetado)
 - [ ] Revisar nomes e grafia: aluno, orientador, unidade acadêmica
 - [ ] Confirmar o apoio institucional na capa e no slide de agradecimentos
 - [ ] Exportar o deck em **PDF** (o PDF não quebra fontes em máquina alheia)

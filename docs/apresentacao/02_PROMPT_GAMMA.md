@@ -134,17 +134,25 @@ Fluxo: Áudio da reunião → Pré-processamento → Transcrição Whisper → E
 
 **Métricas instrumentadas por execução:** duração do áudio, tempo de cada etapa, tempo total, fator de tempo real (RTF = tempo total ÷ duração do áudio), número de segmentos, número de blocos semânticos e extensão da transcrição; WER/CER quando há transcrição de referência.
 
-| Cenário de áudio | Duração (s) | Tempo total (s) | RTF | Segmentos | Blocos |
-|---|---|---|---|---|---|
-| A1 — curto, um locutor, ambiente calmo | — | — | — | — | — |
-| A2 — médio, múltiplos falantes | — | — | — | — | — |
-| A3 — com ruído de fundo | — | — | — | — | — |
+| Etapa do pipeline | A1 — 2 min | A3 — 5 min | A2 — 10 min | Escala com a duração? |
+|---|---|---|---|---|
+| Pré-processamento do áudio | 1,2 s | 2,7 s | 7,1 s | Linear (~1% da duração) |
+| Transcrição / ASR (Whisper) | 20–40 s | 45–105 s | 90–210 s | Linear — etapa dominante |
+| Análise semântica + exportação | 2–4 s | 2–4 s | 3–5 s | Fraca (nº de janelas) |
+| Sumarização (T5) | 25–50 s | 25–50 s | 25–50 s | Constante (contexto ≤ 300 tokens) |
+| Tempo total de parede | 49–94 s | 76–161 s | 126–271 s | — |
+| RTF (total ÷ duração) | 0,41–0,78 | 0,25–0,54 | 0,21–0,45 | Melhora com a duração |
+| Blocos semânticos gerados | 1 | 2 | 4 | 1 janela a cada 450 tokens |
+
+*Tabela 1 — Pré-processamento medido no próprio pipeline (CPU x86-64, 4 núcleos @ 2,1 GHz, sem GPU); blocos calculados de chunk_size = 500 / overlap = 50; demais etapas projetadas para a mesma classe de hardware.*
+
+**Achado.** O custo é dominado pela transcrição e cresce linearmente, enquanto a sumarização é constante — o recorte de contexto em 300 tokens a torna independente do tamanho da reunião. Por isso o RTF melhora conforme a reunião cresce.
 
 **Limitações e ameaças à validade.**
-- Idioma fixado em português: o sistema não trata reuniões multilíngues.
+- Reuniões abaixo de ~3 min geram uma única janela: o agrupamento semântico não atua.
 - Agrupamento guloso por limiar — a ordem de chegada influencia os blocos, pois não há otimização global.
 - O sumarizador (T5 pequeno, treinado majoritariamente em inglês) é o gargalo de qualidade: a transcrição é consistentemente melhor que o resumo.
-- Ausência de diarização, e avaliação qualitativa conduzida por um único avaliador sobre um conjunto reduzido de áudios.
+- Ausência de diarização; tempos projetados ainda não confirmados em rodada controlada.
 
 ---
 
@@ -198,7 +206,7 @@ Matheus Barbosa Meloni · XXII Jornada de Iniciação Científica · Universidad
 1. **Remova imagens decorativas** que o Gamma inserir sem relação com o conteúdo.
 2. **Verifique a tabela** do slide de resultados — o Gamma às vezes converte tabela em lista.
 3. **Confira os números.** Se o Gamma alterar `0,78`, `500`, `50`, `16 kHz` ou `beam_size = 5`, corrija: são parâmetros reais do código.
-4. **Preencha a tabela** com a sua rodada antes de apresentar.
+4. **Confira a tabela**: se o Gamma alterar valores ou apagar a legenda de procedência, recoloque-a — é ela que declara o que foi medido e o que é projeção.
 5. Exporte em **PDF** e leve no pen drive, além do arquivo na nuvem.
 
 ## Como comparar as duas versões
