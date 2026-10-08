@@ -24,13 +24,13 @@ class PipelineController:
 
     def process_audio_file(
         self,
-        audio_path: Path | str,
+        audio_file: Path | str,
         meeting_name: Optional[str] = None,
         export_results: bool = True,
     ) -> Dict[str, Any]:
         """Processes an audio file present on disk."""
         return self.pipeline.process_audio_file(
-            audio_file=audio_path,
+            audio_file=audio_file,
             meeting_name=meeting_name,
             export_results=export_results,
         )
