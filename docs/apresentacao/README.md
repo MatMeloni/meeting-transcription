@@ -13,6 +13,9 @@ Reuniões Utilizando Inteligência Artificial**.
 | [`04_FALAS_EM_SEQUENCIA.docx`](04_FALAS_EM_SEQUENCIA.docx) | **Texto corrido de todas as falas**, do primeiro ao último slide, com rubricas de palco e anexo de arguição — 1.827 palavras, ~14 min a 130 palavras/min |
 | [`build_apresentacao.py`](build_apresentacao.py) | Script `python-pptx` que regenera o deck a partir do template |
 | `template/` | Templates oficiais enviados pelo CFP (pesquisa de campo e revisão bibliográfica) |
+| [`BANNER_VIII_SIMAC_Meloni.pptx`](BANNER_VIII_SIMAC_Meloni.pptx) | **Banner do VIII SIMAC** (58 x 120 cm), para o congresso de 07/11 — moldura oficial do evento, duas colunas, corpo 25 pt |
+| [`BANNER_VIII_SIMAC_Meloni.pdf`](BANNER_VIII_SIMAC_Meloni.pdf) | Mesmo banner em PDF, para envio à gráfica |
+| [`build_banner_simac.py`](build_banner_simac.py) | Script `python-pptx` que gera o banner, com layout medido (sem colisões) e ajuste automático do corpo de texto |
 | `figuras/` | Figuras reaproveitadas do pôster do VII SIMAC: fluxo horizontal do pipeline (Figura 1, slide 4) e arquitetura em quatro camadas (Figura 2, slide 5) |
 
 ## Estrutura do deck
