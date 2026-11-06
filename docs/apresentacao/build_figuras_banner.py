@@ -23,7 +23,7 @@ tr_lo, tr_hi = np.array([20, 45, 90]), np.array([40, 105, 210])
 su_lo, su_hi = np.array([25, 25, 25]), np.array([50, 50, 50])
 tr_mid, su_mid = (tr_lo + tr_hi) / 2, (su_lo + su_hi) / 2
 
-fig, ax = plt.subplots(figsize=(9.4, 5.4), dpi=200)
+fig, ax = plt.subplots(figsize=(9.9, 4.3), dpi=200)
 ax.fill_between(dur, tr_lo, tr_hi, color=AZUL, alpha=0.16, linewidth=0)
 ax.fill_between(dur, su_lo, su_hi, color=LARANJA, alpha=0.16, linewidth=0)
 ax.plot(dur, tr_mid, color=AZUL, lw=2.6, marker="o", ms=9,
@@ -31,9 +31,9 @@ ax.plot(dur, tr_mid, color=AZUL, lw=2.6, marker="o", ms=9,
 ax.plot(dur, su_mid, color=LARANJA, lw=2.6, marker="s", ms=9,
         mfc="white", mew=2.4, mec=LARANJA, label="Sumarização", zorder=3)
 
-ax.annotate("cresce linearmente\ncom a duração", xy=(10, 150), xytext=(6.4, 186),
+ax.annotate("cresce linearmente\ncom a duração", xy=(10, 150), xytext=(6.0, 192),
             color=AZUL, fontsize=15, fontweight="bold", ha="center", va="center")
-ax.annotate("custo constante\n(contexto truncado)", xy=(10, 37), xytext=(6.6, 72),
+ax.annotate("custo constante\n(contexto truncado)", xy=(10, 37), xytext=(6.4, 78),
             color=LARANJA, fontsize=15, fontweight="bold", ha="center", va="center")
 
 ax.set_xlabel("Duração do áudio (min)", fontsize=17, labelpad=9)
@@ -53,7 +53,7 @@ fig.savefig(OUT + "custo_por_etapa.png", bbox_inches="tight")
 plt.close(fig)
 
 # ------------------------------------------------ Figura: banda telefônica
-fig, ax = plt.subplots(figsize=(9.4, 3.5), dpi=200)
+fig, ax = plt.subplots(figsize=(10.8, 2.9), dpi=200)
 ax.add_patch(Rectangle((0, 0.56), 8000, 0.30, facecolor=AZUL, alpha=0.18,
                        edgecolor=AZUL, lw=1.6))
 ax.text(4000, 0.71, "Banda larga — esperada pelo reconhecedor (16 kHz)",
@@ -61,17 +61,17 @@ ax.text(4000, 0.71, "Banda larga — esperada pelo reconhecedor (16 kHz)",
 
 ax.add_patch(Rectangle((300, 0.12), 3100, 0.30, facecolor=LARANJA, alpha=0.30,
                        edgecolor=LARANJA, lw=1.6))
-ax.text(1850, 0.27, "Banda telefônica\n300–3.400 Hz", ha="center", va="center",
+ax.text(1850, 0.27, "Banda telefônica · 300–3.400 Hz", ha="center", va="center",
         fontsize=15, color=LARANJA, fontweight="bold")
 ax.add_patch(Rectangle((3400, 0.12), 4600, 0.30, facecolor="none",
                        edgecolor=MUTED, lw=1.4, hatch="///", alpha=0.55))
-ax.text(5700, 0.27, "conteúdo ausente —\nnão recuperável por reamostragem",
-        ha="center", va="center", fontsize=14, color=MUTED, style="italic")
+ax.text(5700, 0.27, "conteúdo ausente — não recuperável por reamostragem",
+        ha="center", va="center", fontsize=13.5, color=MUTED, style="italic")
 
 ax.annotate("", xy=(8000, 0.02), xytext=(4000, 0.02),
             arrowprops=dict(arrowstyle="-", color=MUTED, lw=1.2))
 ax.text(6000, -0.05, "fricativas /s/, /ʃ/, /f/ concentram energia nesta faixa",
-        ha="center", va="top", fontsize=13.5, color=MUTED)
+        ha="center", va="top", fontsize=12.5, color=MUTED)
 
 ax.set_xlim(-150, 8250); ax.set_ylim(-0.16, 0.95)
 ax.set_xticks([0, 2000, 4000, 6000, 8000])
