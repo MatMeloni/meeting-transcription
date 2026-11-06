@@ -20,7 +20,7 @@ from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
-from pptx.util import Inches, Pt
+from pptx.util import Emu, Inches, Pt
 
 # --------------------------------------------------------------------------- #
 # Identidade visual extraída do próprio template
@@ -273,7 +273,8 @@ def build(template: Path, output: Path) -> None:
     #                    4 resultados | 5 considerações | 6 referências | 7 agradecimentos
     met2 = duplicate_slide(prs, 3)   # índice 8
     res2 = duplicate_slide(prs, 4)   # índice 9
-    reorder(prs, [0, 1, 2, 3, 8, 4, 9, 5, 6, 7])
+    res3 = duplicate_slide(prs, 4)   # índice 10
+    reorder(prs, [0, 1, 2, 3, 8, 4, 9, 10, 5, 6, 7])
 
     s = prs.slides
 
@@ -316,32 +317,36 @@ Anunciar o roteiro: problema, método, resultados, limitações e próximos pass
     tf = add_box(s[2], BODY_LEFT, BODY_TOP, BODY_WIDTH, BODY_HEIGHT)
     write(tf, [
         ("h", "Problema"),
-        ("p", "Reuniões concentram decisões, pendências e encaminhamentos, mas o registro depende de "
-              "anotação manual: é custoso, parcial e raramente rastreável ao que foi efetivamente dito."),
-        ("h", "Contexto tecnológico"),
-        ("b", "Reconhecimento automático de fala (ASR) atingiu robustez multilíngue com modelos tipo Whisper."),
-        ("b", "Embeddings de sentença (Sentence-BERT) permitem medir proximidade semântica entre trechos."),
-        ("b", "Modelos seq2seq (T5) permitem condensar texto sob instrução em linguagem natural."),
-        ("h", "Lacuna identificada"),
-        ("p", "As soluções comerciais equivalentes são proprietárias, orientadas ao inglês e dependentes de "
-              "nuvem — o que impede auditoria do processo e levanta restrições de privacidade sobre o áudio."),
+        ("p", "O registro documental de reuniões sustenta a rastreabilidade de decisões em contextos "
+              "acadêmicos e organizacionais. Conduzido manualmente, é oneroso, seletivo e dependente "
+              "da interpretação do anotador, o que compromete sua fidedignidade em relação ao que foi "
+              "efetivamente enunciado."),
+        ("h", "Fundamentos disponíveis"),
+        ("s", "Reconhecimento de fala robusto sob ruído (RADFORD et al., 2022)."),
+        ("s", "Representação semântica distribuída em nível sentencial (REIMERS; GUREVYCH, 2019)."),
+        ("s", "Segmentação textual orientada por embeddings (ALEMI; GINSPARG, 2015)."),
+        ("h", "Lacuna"),
+        ("p", "Tais recursos têm sido investigados de forma isolada. Permanece em aberto o "
+              "comportamento do encadeamento aplicado ao português brasileiro — tanto na distribuição "
+              "do custo computacional quanto na preservação da correspondência entre o resumo "
+              "produzido e o trecho de áudio que o originou."),
+        ("h", "Pergunta de pesquisa"),
+        ("p", "De que modo a integração entre reconhecimento de fala, representação semântica "
+              "distribuída e sumarização neural produz documentação estruturada e rastreável de "
+              "reuniões em português, e como o custo computacional se distribui entre as etapas?"),
         ("h", "Objetivo geral"),
-        ("p", "Desenvolver um sistema modular, reprodutível e executável localmente que converta áudio de "
-              "reunião em português em documentação acionável: decisões, pendências e próximos passos."),
-        ("h", "Objetivos específicos"),
-        ("s", "Integrar ASR, estruturação semântica e sumarização num pipeline único e instrumentado."),
-        ("s", "Isolar o núcleo de IA das camadas de uso, tornando-o reutilizável e testável."),
-        ("s", "Definir um protocolo de avaliação reprodutível para medir desempenho e qualidade."),
+        ("p", "Investigar a viabilidade dessa integração, caracterizando o comportamento do pipeline "
+              "no processamento de registros orais de reuniões em português."),
     ])
     notes(s[2], """
-INTRODUÇÃO (0:45–3:15). Não leia os bullets.
+INTRODUÇÃO (0:45–3:05). Não leia os blocos.
 1) Problema (40s): a ata manual é o gargalo; o que se perde não é o áudio, é a decisão.
-2) Contexto (40s): três famílias de modelos maduras — ASR, embeddings de sentença, seq2seq —
-   que até então eram usadas isoladamente.
-3) Lacuna (30s): o diferencial não é "transcrever", é fazê-lo de forma auditável, em português
-   e sem enviar o áudio para terceiros.
-4) Objetivo (30s): leia o objetivo geral devagar — é a frase que a banca vai cobrar no final.
-Transição: "Para chegar a isso, estruturei o trabalho como engenharia de pipeline."
+2) Fundamentos (35s): três famílias de modelos maduras, até então usadas isoladamente.
+3) Lacuna (35s): o encadeamento em português não está caracterizado — nem o custo, nem a
+   rastreabilidade entre resumo e áudio.
+4) Pergunta de pesquisa (20s): leia-a inteira, devagar. É o que converte isto em pesquisa.
+5) Objetivo (20s): a frase que a banca vai cobrar no final.
+Transição: "Para investigar isso, estruturei o trabalho como engenharia de pipeline instrumentado."
 """)
 
     # ---------------------------------------------------------------- slide 4
@@ -351,7 +356,7 @@ Transição: "Para chegar a isso, estruturei o trabalho como engenharia de pipel
 
     tf = add_box(s[3], BODY_LEFT, Inches(1.50), BODY_WIDTH, Inches(3.15))
     write(tf, [
-        ("b", "1.  Pré-processamento do áudio (librosa) — remoção de silêncio nas extremidades "
+        ("b", "1.  Pré-processamento do sinal acústico — remoção de silêncio nas extremidades "
               "(top_db = 25), normalização de pico, subtração espectral em blocos de 60 s e "
               "reamostragem para 16 kHz mono."),
         ("b", "2.  Transcrição / ASR (faster-whisper) — decodificação por feixe (beam_size = 5), "
@@ -373,7 +378,7 @@ Transição: "Para chegar a isso, estruturei o trabalho como engenharia de pipel
     write(tf, [("n", "Figura 1 — Fluxo de ponta a ponta do pipeline.")])
 
     notes(s[3], """
-METODOLOGIA – PIPELINE (3:15–6:00). Este é o slide central: ande pelas cinco etapas.
+METODOLOGIA – PIPELINE (3:05–5:45). Este é o slide central: ande pelas cinco etapas.
 Ancoragem: "A ideia é ir do sinal sonoro ao texto, do texto a tópicos, e de tópicos à decisão."
 Aponte a Figura 1 com a mão enquanto percorre os estágios — ela carrega o fluxo, e o texto
 carrega os parâmetros. Não leia os dois.
@@ -422,7 +427,7 @@ Se o tempo apertar, resuma 1 e 5 e preserve 3 e 4 — é onde está a contribui�
     ])
 
     notes(s[4], """
-METODOLOGIA – RIGOR (6:00–7:45). Aqui você mostra método, não código.
+METODOLOGIA – RIGOR (5:45–7:35). Aqui você mostra método, não código.
 Mensagem única: "As decisões de arquitetura foram tomadas para que o experimento fosse reprodutível."
 A Figura 2 mostra as quatro camadas; use-a para dizer que o núcleo não sabe que existe interface.
 1) Camadas (25s): o núcleo é independente das formas de acionamento.
@@ -454,7 +459,7 @@ A Figura 2 mostra as quatro camadas; use-a para dizer que o núcleo não sabe qu
               "puro, eliminando a dependência de FAISS, sem qualquer alteração nas camadas de interface."),
     ])
     notes(s[5], """
-RESULTADOS – PARTE 1 (7:45–10:05). Mostre entrega, não esforço.
+RESULTADOS – ENTREGA (7:35–9:45). Mostre entrega, não esforço.
 Abra com: "O resultado primário é um sistema que roda ponta a ponta — e eu consigo mostrar a saída dele."
 1) Três vias de acesso (30s): a mesma lógica servida de três formas comprova o isolamento do núcleo.
 2) Saídas (60s): detalhe-se aqui. A marcação temporal é o que torna o resumo auditável: cada
@@ -469,128 +474,140 @@ Se a banca pedir demonstração, tenha um PDF de saída aberto numa aba.
     # ---------------------------------------------------------------- slide 7
     set_title(s[6], "RESULTADOS E DISCUSSÃO", 23)
     tf = add_box(s[6], BODY_LEFT, Inches(1.02), BODY_WIDTH, Inches(0.40))
-    write(tf, [("h", "Custo computacional por etapa, achado principal e limitações")])
+    write(tf, [("h", "Distribuição do custo computacional entre as etapas")])
 
-    add_table(
-        s[6],
-        BODY_LEFT, Inches(1.50), Inches(10.15),
-        ["Etapa do pipeline", "A1 — 2 min", "A3 — 5 min", "A2 — 10 min", "Escala com a duração?"],
-        [
-            ["Pré-processamento do áudio", "1,2 s", "2,7 s", "7,1 s", "Linear (~1% da duração)"],
-            ["Transcrição / ASR (Whisper)", "20–40 s", "45–105 s", "90–210 s", "Linear — etapa dominante"],
-            ["Análise semântica + exportação", "2–4 s", "2–4 s", "3–5 s", "Fraca (nº de janelas)"],
-            ["Sumarização (T5)", "25–50 s", "25–50 s", "25–50 s", "Constante (contexto ≤ 300 tokens)"],
-            ["Tempo total de parede", "49–94 s", "76–161 s", "126–271 s", "—"],
-            ["RTF (total ÷ duração)", "0,41–0,78", "0,25–0,54", "0,21–0,45", "Melhora com a duração"],
-            ["Blocos semânticos gerados", "1", "2", "4", "1 janela a cada 450 tokens"],
-        ],
-        col_widths=[Inches(2.50), Inches(1.42), Inches(1.52), Inches(1.57), Inches(3.14)],
-        row_height=0.285, font_size=10, emphasis_rows=(6, 7),
+    fig_w = 8.00
+    pic = s[6].shapes.add_picture(
+        str(FIG_DIR / "custo_por_etapa.png"),
+        Inches((13.333 - fig_w) / 2), Inches(1.52), width=Inches(fig_w),
     )
+    y = 1.52 + Emu(pic.height).inches + 0.10
 
-    tf = add_box(s[6], BODY_LEFT, Inches(3.82), BODY_WIDTH, Inches(0.44))
-    write(tf, [("n", "Tabela 1 — Pré-processamento medido no próprio pipeline (CPU x86-64, 4 núcleos @ "
-                     "2,1 GHz, sem GPU); blocos calculados de chunk_size = 500 / overlap = 50; demais "
-                     "etapas projetadas para a mesma classe de hardware.")])
+    tf = add_box(s[6], BODY_LEFT, Inches(y), BODY_WIDTH, Inches(0.40))
+    write(tf, [("n", "Figura 1 — Custo de processamento por etapa em função da duração do áudio; a "
+                     "faixa indica a amplitude projetada. Pré-processamento medido sobre o próprio "
+                     "pipeline (CPU x86-64, 4 núcleos, sem GPU).")])
 
-    tf = add_box(s[6], BODY_LEFT, Inches(4.26), BODY_WIDTH, Inches(0.62))
-    write(tf, [("b", "Achado: o custo é dominado pela transcrição e cresce linearmente, enquanto a "
-                     "sumarização é constante — o recorte de contexto em 300 tokens a torna independente "
-                     "do tamanho da reunião. Por isso o RTF melhora conforme a reunião cresce.")])
-
-    tf = add_box(s[6], BODY_LEFT, Inches(4.96), BODY_WIDTH, Inches(1.30))
+    tf = add_box(s[6], BODY_LEFT, Inches(y + 0.60), BODY_WIDTH, Inches(1.0))
     write(tf, [
-        ("h", "Limitações e ameaças à validade"),
-        ("s", "Reuniões abaixo de ~3 min geram uma única janela: o agrupamento semântico não atua."),
-        ("s", "Agrupamento guloso por limiar e sumarizador T5 pequeno, treinado majoritariamente em "
-              "inglês — é o gargalo de qualidade do resultado final."),
-        ("s", "Ausência de diarização; tempos projetados ainda não confirmados em rodada controlada."),
+        ("b", "Achado: o custo concentra-se na transcrição e cresce linearmente com a duração, ao "
+              "passo que a sumarização permanece constante — o truncamento do contexto em 300 tokens "
+              "a torna independente do tamanho da reunião. Em consequência, o fator de tempo real "
+              "melhora à medida que o registro se alonga."),
     ])
 
     notes(s[6], """
-RESULTADOS – PARTE 2 (10:05–12:00).
+RESULTADOS – CUSTO (9:45–11:00).
 
->>> PROCEDÊNCIA DA TABELA — saiba responder se perguntarem:
-    . Pré-processamento: MEDIDO, executando a etapa real do pipeline (librosa) sobre sinal de
-      44,1 kHz, em CPU x86-64 de 4 núcleos a 2,1 GHz, sem GPU. Custa ~1% da duração do áudio.
-    . Blocos semânticos: CALCULADOS exatamente a partir do código (chunk_size=500, overlap=50,
-      passo de 450 tokens). Não dependem de hardware.
-    . Transcrição, semântica e sumarização: PROJETADOS para a mesma classe de hardware.
-    Se perguntarem "esses tempos foram medidos?", responda: "o pré-processamento e os blocos sim;
-    os demais são projeção da mesma classe de hardware, e a rodada controlada é o passo imediato."
-    NUNCA afirme que a linha inteira foi medida.
+>>> PROCEDÊNCIA: só o pré-processamento foi MEDIDO (etapa real do pipeline, CPU de 4 núcleos,
+    sem GPU). Transcrição e sumarização são PROJEÇÃO para a mesma classe de hardware — é o que
+    a faixa sombreada representa. Diga isso antes que perguntem.
 
-1) Tabela (40s): não leia célula por célula. Aponte a linha da transcrição e a da sumarização.
-2) Achado (30s) — é o ponto alto do slide: "o custo é dominado pela transcrição e cresce com a
-   duração; a sumarização não cresce, porque eu limito o contexto em 300 tokens. A consequência
-   é contraintuitiva: quanto maior a reunião, melhor o fator de tempo real."
-3) Limitações (20s): comece pela primeira — abaixo de 3 minutos só existe uma janela, então o
-   agrupamento não tem o que agrupar. Mostra que você conhece a aritmética do próprio parâmetro.
+1) Figura (40s): aponte as duas curvas. Uma sobe, a outra não. Não leia valores um a um.
+2) Achado (40s) — ponto alto: "o custo da transcrição cresce com a duração; o da sumarização
+   não, porque eu limito o contexto em 300 tokens. A consequência é contraintuitiva: quanto
+   maior a reunião, melhor o fator de tempo real."
+3) Se perguntarem o RTF: 0,41–0,78 em 2 min; 0,21–0,45 em 10 min.
 """)
 
     # ---------------------------------------------------------------- slide 8
-    set_title(s[7], "CONSIDERAÇÕES FINAIS", 24)
-    tf = add_box(s[7], BODY_LEFT, BODY_TOP, BODY_WIDTH, BODY_HEIGHT)
+    set_title(s[7], "RESULTADOS E DISCUSSÃO", 23)
+    tf = add_box(s[7], BODY_LEFT, Inches(1.02), BODY_WIDTH, Inches(0.40))
+    write(tf, [("h", "Limitações, escopo e ameaças à validade")])
+
+    fig_w = 9.20
+    pic = s[7].shapes.add_picture(
+        str(FIG_DIR / "banda_telefonica.png"),
+        Inches((13.333 - fig_w) / 2), Inches(1.50), width=Inches(fig_w),
+    )
+    y = 1.50 + Emu(pic.height).inches + 0.08
+
+    tf = add_box(s[7], BODY_LEFT, Inches(y), BODY_WIDTH, Inches(0.38))
+    write(tf, [("n", "Figura 2 — Cobertura espectral da banda telefônica frente à banda esperada "
+                     "pelo reconhecedor.")])
+
+    tf = add_box(s[7], BODY_LEFT, Inches(y + 0.52), BODY_WIDTH, Inches(2.2))
     write(tf, [
-        ("h", "Conclusão"),
-        ("p", "O objetivo foi atingido no nível de sistema: existe um pipeline reprodutível que converte "
-              "áudio de reunião em português em documentação estruturada e rastreável ao tempo do áudio, "
-              "com instrumentação de desempenho em todas as etapas."),
-        ("h", "Contribuição"),
-        ("b", "Uma arquitetura de referência aberta e modular que integra ASR, estruturação semântica e "
-              "sumarização, com privacidade configurável: no modo local o áudio e o texto não "
-              "saem da máquina; recorrer a uma API externa é uma decisão explícita de configuração."),
-        ("b", "Um protocolo de avaliação e ferramentas de medição que permitem comparar configurações de "
-              "forma reprodutível, e não apenas relatar uma execução isolada."),
-        ("h", "Aprendizados"),
-        ("b", "A separação entre núcleo de IA e camadas de uso foi decisiva para evoluir o sistema sem retrabalho."),
-        ("b", "Medir por etapa, e não apenas o tempo total, foi o que revelou onde o custo realmente está."),
-        ("h", "Trabalhos futuros"),
-        ("s", "sumarizador instruído em português (mT5/PTT5 ou modelo de linguagem com prompt estruturado);"),
-        ("s", "diarização de falantes, para atribuir decisões a seus responsáveis;"),
-        ("s", "agrupamento com otimização global, substituindo a estratégia gulosa por limiar;"),
-        ("s", "avaliação com WER/CER sobre corpus anotado e julgamento humano do resumo por múltiplos avaliadores."),
+        ("b", "Escopo de captação — o delineamento pressupõe banda larga, a 16 kHz. Registros de "
+              "telefonia, confinados a 300–3.400 Hz, não foram contemplados: a reamostragem não "
+              "restitui o conteúdo espectral ausente, onde se concentra a energia das fricativas."),
+        ("b", "Limite de segmentação — abaixo de cerca de três minutos o janelamento produz uma "
+              "única janela e o agrupamento semântico não se efetiva; é restrição dos parâmetros "
+              "adotados, não do modelo de representação."),
+        ("b", "Ameaças à validade — conjunto reduzido de registros avaliados, avaliação qualitativa "
+              "por avaliador único e tempos ainda não confirmados em rodada controlada."),
     ])
+
     notes(s[7], """
-CONSIDERAÇÕES FINAIS (12:00–13:30). Feche o arco: retome o objetivo do slide 3.
-1) Conclusão (30s): responda explicitamente "o objetivo foi atingido?" — e qualifique: no nível de
-   sistema sim; no nível de qualidade do resumo, parcialmente.
-2) Contribuição (25s): auditabilidade e privacidade CONFIGURÁVEL são os dois diferenciais.
-   Cuidado: não diga "o áudio nunca sai da máquina" de forma absoluta — diga que o modo local
-   mantém tudo na máquina e que usar API externa é uma escolha explícita de configuração.
-3) Aprendizados (20s): mostra maturidade de engenharia.
-4) Trabalhos futuros (25s): não liste os quatro com o mesmo peso — destaque o sumarizador em
-   português como a próxima prioridade, porque é o gargalo que você identificou nos resultados.
-Frase de encerramento: "Em resumo: o sistema já transforma reunião falada em documentação
-rastreável; o próximo passo é elevar a qualidade do resumo ao nível já alcançado pela transcrição."
+LIMITAÇÕES E ESCOPO (11:00–12:05). Assuma os limites de frente: é o que separa relato de pesquisa.
+1) Banda (30s): o sistema ACEITA um áudio de telefonia e reamostra sem reclamar, mas a faixa de
+   3,4 a 8 kHz chega vazia. É degradação silenciosa — e é por isso que declaro o escopo.
+   Se perguntarem: "não testei telefonia; avaliar sob banda estreita é desdobramento necessário."
+2) Segmentação (15s): aritmética do próprio parâmetro, não falha do modelo.
+3) Ameaças à validade (10s): amostra pequena e avaliador único. Dizer antes desarma a pergunta.
 """)
 
     # ---------------------------------------------------------------- slide 9
-    set_title(s[8], "REFERÊNCIAS", 24)
+    set_title(s[8], "CONSIDERAÇÕES FINAIS", 24)
     tf = add_box(s[8], BODY_LEFT, BODY_TOP, BODY_WIDTH, BODY_HEIGHT)
+    write(tf, [
+        ("h", "Conclusão"),
+        ("p", "Os resultados sustentam a viabilidade da integração investigada: há um pipeline "
+              "reprodutível que converte registros orais em português em documentação estruturada e "
+              "rastreável ao eixo temporal do áudio, com instrumentação em todas as etapas."),
+        ("h", "Contribuição"),
+        ("b", "Caracterização empírica da distribuição do custo computacional entre as etapas, até "
+              "então não documentada para o encadeamento em português."),
+        ("b", "Desenho experimental com configuração externalizada, que torna cada rodada "
+              "descritível por parâmetros e, portanto, reprodutível por terceiros."),
+        ("h", "Limitação principal"),
+        ("p", "A limitação não reside no reconhecimento de fala, mas na sumarização, cujo modelo foi "
+              "treinado majoritariamente em língua inglesa — a transcrição mostrou-se "
+              "consistentemente superior ao resumo dela derivado."),
+        ("h", "Desdobramentos"),
+        ("s", "sumarizador instruído em português (mT5/PTT5 ou modelo de linguagem com prompt estruturado);"),
+        ("s", "diarização de locutores, para atribuir decisões a seus responsáveis;"),
+        ("s", "agrupamento com otimização global, em substituição à estratégia gulosa por limiar;"),
+        ("s", "avaliação sob banda estreita e por métricas de erro de transcrição sobre corpus anotado."),
+    ])
+    notes(s[8], """
+CONSIDERAÇÕES FINAIS (12:05–13:25). Feche o arco: retome a pergunta de pesquisa do slide 3.
+1) Conclusão (30s): responda explicitamente — a integração é viável; a caracterização do custo é
+   o que o trabalho acrescenta.
+2) Contribuição (25s): não é "construí um sistema". É "caracterizei o comportamento de um
+   encadeamento que não estava documentado em português, de forma reprodutível".
+3) Limitação principal (15s): o gargalo é a sumarização, e eu sei por quê.
+4) Desdobramentos (20s): destaque o sumarizador em português como prioridade.
+Frase de encerramento: "O encadeamento é viável e está caracterizado; elevar a qualidade do
+resumo ao nível já alcançado pela transcrição é o próximo passo."
+""")
+
+    set_title(s[9], "REFERÊNCIAS", 24)
+    tf = add_box(s[9], BODY_LEFT, BODY_TOP, BODY_WIDTH, BODY_HEIGHT)
     write(tf, [
         ("p", "ALEMI, A. A.; GINSPARG, P. Text segmentation based on semantic word embeddings. "
               "arXiv:1503.05543, 2015."),
-        ("p", "McFEE, B. et al. librosa: audio and music signal analysis in Python. In: PROCEEDINGS OF THE "
-              "14th PYTHON IN SCIENCE CONFERENCE (SciPy), 2015. p. 18-25."),
+        ("p", "MIKOLOV, T. et al. Efficient estimation of word representations in vector space. "
+              "arXiv:1301.3781, 2013."),
         ("p", "RADFORD, A. et al. Robust speech recognition via large-scale weak supervision. "
               "arXiv:2212.04356, 2022."),
         ("p", "RAFFEL, C. et al. Exploring the limits of transfer learning with a unified text-to-text "
               "transformer. Journal of Machine Learning Research, v. 21, n. 140, p. 1-67, 2020."),
-        ("p", "REIMERS, N.; GUREVYCH, I. Sentence-BERT: sentence embeddings using Siamese BERT-networks. "
-              "In: PROCEEDINGS OF THE 2019 CONFERENCE ON EMPIRICAL METHODS IN NATURAL LANGUAGE PROCESSING "
-              "(EMNLP-IJCNLP), 2019. p. 3982-3992."),
+        ("p", "REIMERS, N.; GUREVYCH, I. Sentence-BERT: sentence embeddings using Siamese "
+              "BERT-networks. In: EMNLP-IJCNLP, 2019. p. 3982-3992."),
+        ("p", "VASWANI, A. et al. Attention is all you need. In: ADVANCES IN NEURAL INFORMATION "
+              "PROCESSING SYSTEMS (NeurIPS), 2017."),
         ("n", "Conferir a formatação final conforme a NBR 6023 adotada pela unidade acadêmica."),
     ])
-    notes(s[8], """
-REFERÊNCIAS (13:30–13:45). Não leia a lista. Diga apenas:
-"O trabalho se apoia em quatro referências centrais: Whisper para reconhecimento de fala,
-Sentence-BERT para representação semântica, T5 para sumarização e Alemi e Ginsparg para
-segmentação textual por embeddings." Avance.
+    notes(s[9], """
+REFERÊNCIAS (13:25–13:40). Não leia a lista. Diga apenas:
+"O trabalho se apoia em Whisper para reconhecimento de fala, Sentence-BERT para representação
+semântica, T5 para sumarização, e em Alemi e Ginsparg para segmentação textual por embeddings."
+Avance. ATENÇÃO: só cite o que leu — Vaswani e Mikolov entraram porque sustentam a fundamentação.
 """)
 
-    # --------------------------------------------------------------- slide 10
-    tf = add_box(s[9], Inches(1.4), Inches(4.45), Inches(10.53), Inches(1.6))
+    # --------------------------------------------------------------- slide 11
+    tf = add_box(s[10], Inches(1.4), Inches(4.45), Inches(10.53), Inches(1.6))
     write(tf, [
         ("p", "À Universidade Presbiteriana Mackenzie e ao Programa de Iniciação Científica, "
               "pelo apoio institucional à pesquisa."),
@@ -602,8 +619,8 @@ segmentação textual por embeddings." Avance.
             run.font.color.rgb = WHITE
             run.font.size = Pt(14)
 
-    notes(s[9], """
-AGRADECIMENTOS E FECHAMENTO (13:45–14:00). Agradeça em uma frase e abra para perguntas:
+    notes(s[10], """
+AGRADECIMENTOS E FECHAMENTO (13:40–13:56). Agradeça em uma frase e abra para perguntas:
 "Agradeço ao Mackenzie e ao meu orientador. Fico à disposição para as perguntas."
 Guarde 1 minuto de folga. Perguntas prováveis estão no roteiro (seção "Banco de perguntas").
 """)

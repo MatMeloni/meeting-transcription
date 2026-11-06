@@ -93,17 +93,19 @@ corpo.push(fala("Vou começar com uma constatação simples: **toda reunião pro
 corpo.push(fala("Nos próximos minutos eu vou percorrer o problema, o método que adotei, o que o sistema efetivamente entrega, as limitações que identifiquei e os próximos passos."));
 
 // ------------------------------------------------------------------ slide 3
-corpo.push(slide("SLIDE 3 · INTRODUÇÃO", "0:45 – 3:15"));
+corpo.push(slide("SLIDE 3 · INTRODUÇÃO", "0:45 – 3:05"));
 corpo.push(fala("Começo pelo problema. O gargalo de uma reunião não é gravá-la — é transformar o que foi dito em algo acionável. Hoje isso depende de alguém anotando à mão, em paralelo à conversa. O resultado é um registro parcial, custoso de produzir e difícil de conferir. E o que se perde não é o áudio: é a decisão, o responsável e o prazo."));
 corpo.push(fala("Do lado da tecnologia, três famílias de modelos amadureceram nos últimos anos. O reconhecimento automático de fala atingiu robustez multilíngue com modelos do tipo Whisper. Os modelos de representação de sentenças, como o Sentence-BERT, permitem medir proximidade semântica entre trechos de texto. E os modelos sequência-a-sequência, como o T5, permitem condensar texto sob instrução em linguagem natural. Essas três capacidades existiam de forma isolada. A pergunta que orientou o projeto foi: o que acontece quando eu as encadeio num pipeline único, com uma finalidade específica?"));
-corpo.push(fala("Existem ferramentas comerciais que percorrem parte desse caminho. Mas são caixas fechadas, orientadas ao inglês e dependentes de nuvem. Para uma reunião com conteúdo sensível, enviar o áudio para um terceiro é um problema concreto — e, do ponto de vista científico, não é possível auditar um processo cujo funcionamento interno não se pode inspecionar. É aí que está a lacuna que este trabalho ocupa."));
-corpo.push(rubrica("[Pausa. Esta é a frase que a banca vai cobrar no final — diga-a devagar, olhando para eles.]"));
-corpo.push(fala("O objetivo geral, portanto, foi: **desenvolver um sistema modular, reprodutível e executável localmente, que converta áudio de reunião em português em documentação acionável — decisões, pendências e próximos passos.**"));
-corpo.push(fala("Para chegar lá, defini três objetivos específicos: integrar reconhecimento de fala, estruturação semântica e sumarização num pipeline único e instrumentado; isolar o núcleo de inteligência artificial das camadas de uso, de modo que ele fosse reutilizável e testável; e definir um protocolo de avaliação reprodutível, que permitisse medir desempenho e qualidade."));
+corpo.push(fala("Essas três capacidades, porém, têm sido investigadas de forma isolada. O que permanece em aberto é o comportamento do **encadeamento** quando aplicado ao português brasileiro: nem a distribuição do custo computacional entre as etapas, nem a preservação da correspondência entre o resumo e o trecho de áudio que o originou estão documentadas. É essa a lacuna."));
+corpo.push(rubrica("[Pausa. Leia a pergunta de pesquisa inteira, devagar. É ela que converte isto em pesquisa.]"));
+corpo.push(fala("Daí a pergunta que orienta o trabalho: **de que modo a integração entre reconhecimento de fala, representação semântica distribuída e sumarização neural produz documentação estruturada e rastreável de reuniões em português, e como o custo computacional se distribui entre as etapas?**"));
+corpo.push(rubrica("[Pausa de novo antes do objetivo.]"));
+corpo.push(fala("O objetivo geral é **investigar a viabilidade dessa integração, caracterizando o comportamento do pipeline no processamento de registros orais em português.**"));
+corpo.push(fala("Dele decorrem três objetivos específicos: descrever as decisões metodológicas que asseguram reprodutibilidade; caracterizar a distribuição do custo entre as etapas; e analisar os limites da segmentação em função dos parâmetros de janelamento."));
 corpo.push(fala("Para chegar nisso, estruturei o trabalho como engenharia de pipeline."));
 
 // ------------------------------------------------------------------ slide 4
-corpo.push(slide("SLIDE 4 · METODOLOGIA — ARQUITETURA DO PIPELINE", "3:15 – 6:00"));
+corpo.push(slide("SLIDE 4 · METODOLOGIA — ARQUITETURA DO PIPELINE", "3:05 – 5:45"));
 corpo.push(rubrica("[Slide central. Use o fluxo de setas na parte de baixo como trilho: aponte com a mão o estágio de que está falando.]"));
 corpo.push(fala("A ideia metodológica central é ir do sinal sonoro ao texto, do texto a tópicos, e de tópicos à decisão. Cada etapa tem uma responsabilidade única e uma saída bem definida para a próxima. São cinco estágios, no fluxo da parte inferior do slide."));
 corpo.push(fala("O primeiro é o **pré-processamento do áudio**. O princípio aqui é simples: lixo entra, lixo sai. Antes de qualquer modelo, eu corto o silêncio nas extremidades, normalizo a amplitude, atenuo o ruído por subtração espectral e reamostro para dezesseis quilohertz, mono. A subtração espectral é feita em blocos de sessenta segundos, porque gravações longas estouravam a memória quando processadas de uma vez só."));
@@ -114,7 +116,7 @@ corpo.push(fala("O quinto é a **sumarização**, e aqui há uma escolha de dese
 corpo.push(rubrica("[Se estiver atrasado: resuma os estágios 1 e 5 em uma frase cada e preserve 3 e 4 — é onde está a contribuição técnica.]"));
 
 // ------------------------------------------------------------------ slide 5
-corpo.push(slide("SLIDE 5 · METODOLOGIA — DECISÕES DE PROJETO E VERIFICAÇÃO", "6:00 – 7:45"));
+corpo.push(slide("SLIDE 5 · METODOLOGIA — DECISÕES DE PROJETO E VERIFICAÇÃO", "5:45 – 7:35"));
 corpo.push(fala("Este slide trata das decisões de projeto, e a mensagem é uma só: **elas foram tomadas para que o experimento fosse reprodutível.**"));
 corpo.push(fala("A primeira é a arquitetura em camadas. O núcleo de inteligência artificial é independente das camadas de uso — linha de comando, API, painel web. O núcleo não sabe que existe uma interface. Isso não é organização de pastas: é o que permite testá-lo e reutilizá-lo isoladamente."));
 corpo.push(fala("A segunda é a configuração externalizada. Modelo de reconhecimento de fala, modelo de embeddings, sumarizador, tamanho de janela, sobreposição e limiar de similaridade são todos variáveis de ambiente. Isso significa que **uma rodada experimental passa a ser descrita por um conjunto de variáveis, e não por uma alteração de código.** Outro pesquisador reproduz a minha rodada sem tocar no programa — e esse é, para mim, o argumento metodológico mais forte do trabalho."));
@@ -123,7 +125,7 @@ corpo.push(fala("A quarta é a verificação, com uma suíte de testes automatiz
 corpo.push(fala("E a quinta é o protocolo experimental, com quatro perfis de áudio. Eles não são arbitrários: cada um estressa uma etapa diferente. O ruído estressa o pré-processamento; múltiplos falantes estressam a segmentação; o silêncio inicial estressa o filtro de atividade de voz."));
 
 // ------------------------------------------------------------------ slide 6
-corpo.push(slide("SLIDE 6 · RESULTADOS E DISCUSSÃO — ENTREGA FUNCIONAL", "7:45 – 10:05"));
+corpo.push(slide("SLIDE 6 · RESULTADOS E DISCUSSÃO — ENTREGA FUNCIONAL", "7:35 – 9:45"));
 corpo.push(fala("Passo aos resultados. O resultado primário é um sistema que roda de ponta a ponta — e do qual eu consigo mostrar a saída."));
 corpo.push(fala("Ele está acessível por três vias: linha de comando, uma API REST com os endpoints de verificação de saúde e de transcrição, e um painel Streamlit, além de um front-end web. Isso não é conveniência: é a demonstração prática de que o núcleo está isolado, porque a mesma lógica é servida de três formas diferentes."));
 corpo.push(rubrica("[Desacelere aqui. Este parágrafo é o coração dos resultados.]"));
@@ -133,32 +135,36 @@ corpo.push(fala("Entreguei também as ferramentas de medição: um script que ag
 corpo.push(fala("Por fim, uma observação de discussão: a modularidade foi testada na prática. Eu troquei a implementação do agrupamento semântico, eliminando uma dependência externa, sem tocar em nenhuma das camadas de interface. Esse é o tipo de evidência que mostra que a separação arquitetural não era apenas uma intenção declarada."));
 
 // ------------------------------------------------------------------ slide 7
-corpo.push(slide("SLIDE 7 · RESULTADOS E DISCUSSÃO — CUSTO, ACHADO E LIMITAÇÕES", "10:05 – 12:00"));
-corpo.push(fala("Este slide traz o custo computacional por etapa, que é o que a instrumentação permitiu levantar."));
-corpo.push(rubrica("[Procedência da tabela: diga isto espontaneamente, antes que perguntem. Vale mais declarar do que ser cobrado.]"));
-corpo.push(fala("Uma observação de método antes dos números: as linhas da tabela têm origens diferentes, e isso está declarado na legenda. **O pré-processamento foi medido**, executando a etapa real do pipeline numa CPU de quatro núcleos, sem GPU: custa cerca de um por cento da duração do áudio. **O número de blocos é calculado** dos parâmetros de janela, e não depende de hardware. Os tempos de transcrição e sumarização **são projeções**, e a rodada controlada é o passo imediato do trabalho."));
-corpo.push(fala("O que a tabela mostra é que o custo não está distribuído: está concentrado na transcrição."));
-corpo.push(rubrica("[Ponto alto do slide. Diga com calma — é um achado seu, não um dado de catálogo.]"));
+corpo.push(slide("SLIDE 7 · RESULTADOS — DISTRIBUIÇÃO DO CUSTO", "9:45 – 11:00"));
+corpo.push(rubrica("[Procedência: diga isto espontaneamente, antes que perguntem.]"));
+corpo.push(fala("Uma observação de método antes do gráfico: **só o pré-processamento foi medido**, executando a etapa real do pipeline numa CPU de quatro núcleos, sem GPU. Transcrição e sumarização são **projeção** para a mesma classe de hardware — é o que a faixa sombreada representa."));
+corpo.push(fala("O que a instrumentação por etapa mostrou é que o custo não se distribui de forma uniforme: ele se concentra na transcrição."));
+corpo.push(rubrica("[Ponto alto. Aponte as duas curvas e diga com calma.]"));
 corpo.push(fala("E daí vem o achado principal. **O custo da transcrição cresce linearmente com a duração da reunião. O da sumarização não cresce**, porque eu limito o contexto em trezentos tokens por seção. A consequência é contraintuitiva: **quanto maior a reunião, melhor o fator de tempo real.** Numa reunião de dois minutos o custo fixo da sumarização domina; numa de dez, ele se dilui."));
-corpo.push(fala("Quanto às limitações, começo pela mais específica: abaixo de três minutos a transcrição não chega a quinhentos tokens, então existe uma única janela e o agrupamento não tem o que agrupar. É consequência direta da aritmética do parâmetro que eu escolhi."));
-corpo.push(fala("As demais: o agrupamento é guloso, então a ordem de chegada influencia os blocos; o sumarizador é um T5 pequeno, treinado majoritariamente em inglês, e é o gargalo de qualidade — **a transcrição é consistentemente melhor que o resumo, e eu sei por quê**; e não há diarização: o sistema registra o que foi dito, não quem disse."));
+corpo.push(fala("Em números, o fator de tempo real vai de cerca de zero vírgula quatro a zero vírgula oito em áudios de dois minutos, para zero vírgula dois a zero vírgula quatro e meio em áudios de dez."));
+
+corpo.push(slide("SLIDE 8 · RESULTADOS — LIMITAÇÕES E ESCOPO", "11:00 – 12:05"));
+corpo.push(fala("Passo às limitações, e quero assumi-las de frente."));
+corpo.push(fala("A primeira é de escopo de captação. O delineamento pressupõe banda larga, a dezesseis quilohertz. **Registros de telefonia não foram contemplados**: eles ficam confinados entre trezentos e três mil e quatrocentos hertz, e a reamostragem não restitui o conteúdo espectral que nunca foi capturado — justamente a faixa onde se concentra a energia das fricativas. O sistema aceitaria o arquivo e degradaria em silêncio, e é por isso que eu declaro o escopo."));
+corpo.push(fala("A segunda é o limite de segmentação: abaixo de cerca de três minutos, o janelamento produz uma única janela e o agrupamento não tem o que agrupar. É consequência direta do parâmetro que escolhi, não falha do modelo de representação."));
+corpo.push(fala("E as ameaças à validade: conjunto reduzido de registros, avaliação qualitativa por um único avaliador, e tempos ainda não confirmados em rodada controlada."));
 
 // ------------------------------------------------------------------ slide 8
-corpo.push(slide("SLIDE 8 · CONSIDERAÇÕES FINAIS", "12:00 – 13:30"));
-corpo.push(fala("Voltando ao objetivo do início. Ele foi atingido no nível de sistema: existe um pipeline reprodutível que converte áudio de reunião em português em documentação estruturada e rastreável ao tempo do áudio. No nível da qualidade do resumo, foi atingido parcialmente — e eu sei exatamente onde está o limite."));
-corpo.push(fala("A contribuição tem dois diferenciais que quero deixar explícitos. O primeiro é a **auditabilidade**: cada item do resumo volta ao minuto do áudio. O segundo é a **privacidade**: o áudio não sai da máquina onde o sistema roda. Soma-se o protocolo de avaliação, que permite comparar configurações de forma reprodutível, e não apenas relatar uma execução isolada."));
+corpo.push(slide("SLIDE 9 · CONSIDERAÇÕES FINAIS", "12:05 – 13:25"));
+corpo.push(fala("Voltando à pergunta do início. A integração é viável: existe um pipeline reprodutível que converte registros orais em português em documentação estruturada e rastreável ao eixo temporal do áudio."));
+corpo.push(fala("A contribuição não é ter construído um sistema. É a **caracterização empírica de como o custo se distribui** nesse encadeamento aplicado ao português, que não estava documentada; e um desenho experimental de configuração externalizada, que torna cada rodada descritível por parâmetros e reprodutível por terceiros."));
 corpo.push(fala("Dos aprendizados, destaco dois: separar o núcleo das interfaces evitou retrabalho ao longo do projeto; e medir por etapa revelou onde o custo estava de verdade."));
 corpo.push(fala("Nos trabalhos futuros, a prioridade é um sumarizador instruído em português, porque é o gargalo que os próprios resultados apontaram. Em seguida, diarização de falantes, para atribuir cada decisão a um responsável; agrupamento com otimização global; e avaliação com WER e CER sobre corpus anotado."));
 corpo.push(rubrica("[Frase de encerramento. Pausa antes, e olhe para a banca.]"));
-corpo.push(fala("Em resumo: **o sistema já transforma reunião falada em documentação rastreável. O próximo passo é elevar a qualidade do resumo ao nível que a transcrição já alcançou.**"));
+corpo.push(fala("Em resumo: **o encadeamento é viável e está caracterizado. Elevar a qualidade do resumo ao nível que a transcrição já alcançou é o próximo passo.**"));
 
 // ------------------------------------------------------------------ slide 9
-corpo.push(slide("SLIDE 9 · REFERÊNCIAS", "13:30 – 13:45"));
+corpo.push(slide("SLIDE 10 · REFERÊNCIAS", "13:25 – 13:40"));
 corpo.push(rubrica("[Não leia a lista. Uma frase e avance.]"));
 corpo.push(fala("O trabalho se apoia em quatro referências centrais: Whisper, para reconhecimento de fala; Sentence-BERT, para representação semântica; T5, para sumarização; e Alemi e Ginsparg, para segmentação textual por embeddings."));
 
 // ----------------------------------------------------------------- slide 10
-corpo.push(slide("SLIDE 10 · AGRADECIMENTOS E ENCERRAMENTO", "13:45 – 14:00"));
+corpo.push(slide("SLIDE 11 · AGRADECIMENTOS E ENCERRAMENTO", "13:40 – 13:56"));
 corpo.push(fala("Agradeço à Universidade Presbiteriana Mackenzie e ao Programa de Iniciação Científica pelo apoio institucional, e ao professor Victor Inácio de Oliveira pela orientação ao longo do projeto."));
 corpo.push(fala("Fico à disposição para as perguntas. Muito obrigado."));
 

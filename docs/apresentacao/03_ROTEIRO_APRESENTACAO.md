@@ -59,17 +59,18 @@ Três áudios curtos gravados com o seu microfone bastam. Com os modelos em cach
 | Slide | Seção | Entra em | Dura |
 |-------|-------|----------|------|
 | 1–2 | Capa e identificação | 0:00 | 0:45 |
-| 3 | Introdução | 0:45 | 2:30 |
-| 4 | Metodologia — pipeline | 3:15 | 2:45 |
-| 5 | Metodologia — rigor | 6:00 | 1:45 |
-| 6 | Resultados — entrega | 7:45 | 2:20 |
-| 7 | Resultados — avaliação | 10:05 | 1:55 |
-| 8 | Considerações finais | 12:00 | 1:30 |
-| 9 | Referências | 13:30 | 0:15 |
-| 10 | Agradecimentos | 13:45 | 0:15 |
-| — | **Folga / perguntas** | 14:00 | 1:00 |
+| 3 | Introdução (com pergunta de pesquisa) | 0:45 | 2:20 |
+| 4 | Metodologia — pipeline | 3:05 | 2:40 |
+| 5 | Metodologia — rigor | 5:45 | 1:50 |
+| 6 | Resultados — entrega | 7:35 | 2:10 |
+| 7 | Resultados — distribuição do custo | 9:45 | 1:15 |
+| 8 | Resultados — limitações e escopo | 11:00 | 1:05 |
+| 9 | Considerações finais | 12:05 | 1:20 |
+| 10 | Referências | 13:25 | 0:15 |
+| 11 | Agradecimentos | 13:40 | 0:16 |
+| — | **Folga / perguntas** | 13:56 | 1:04 |
 
-**Regra de ouro:** se aos **7:45** você ainda não estiver no slide 6, pule o slide 5 e
+**Regra de ouro:** se aos **7:35** você ainda não estiver no slide 6, pule o slide 5 e
 vá direto para resultados. Banca perdoa falta de detalhe de método; não perdoa
 apresentação que estoura o tempo e é interrompida antes da conclusão.
 
@@ -95,7 +96,7 @@ por nervosismo. Não comece com "bom, então…".
 
 ---
 
-## Slide 3 · Introdução (0:45 – 3:15)
+## Slide 3 · Introdução (0:45 – 3:05)
 
 **Quatro movimentos, ~35 s cada. Não leia os marcadores.**
 
@@ -117,7 +118,7 @@ por nervosismo. Não comece com "bom, então…".
 
 ---
 
-## Slide 4 · Metodologia — pipeline (3:15 – 6:00)
+## Slide 4 · Metodologia — pipeline (3:05 – 5:45)
 
 **Este é o slide central.** Use a **Figura 1** (fluxo horizontal, na parte inferior) como trilho:
 aponte com a mão o estágio de que está falando. A figura carrega o fluxo; o texto carrega os
@@ -140,7 +141,7 @@ ali que está a contribuição técnica do trabalho.
 
 ---
 
-## Slide 5 · Metodologia — rigor (6:00 – 7:45)
+## Slide 5 · Metodologia — rigor (5:45 – 7:35)
 
 **Mensagem única:** *"As decisões de arquitetura foram tomadas para que o experimento
 fosse reprodutível."* Não fale de código — fale de método.
@@ -162,7 +163,7 @@ fosse reprodutível."* Não fale de código — fale de método.
 
 ---
 
-## Slide 6 · Resultados — entrega funcional (7:45 – 10:05)
+## Slide 6 · Resultados — entrega funcional (7:35 – 9:45)
 
 **Abra com:** "O resultado primário é um sistema que roda de ponta a ponta — e eu consigo
 mostrar a saída dele."
@@ -187,22 +188,27 @@ tente rodar o pipeline ao vivo.
 
 ---
 
-## Slide 7 · Resultados — custo, achado e limitações (10:05 – 12:00)
+## Slide 7 · Resultados — distribuição do custo (9:45 – 11:00)
 
-- **Tabela (0:40).** Não leia célula por célula. Aponte duas linhas: a da transcrição e a da
-  sumarização. "O que a instrumentação por etapa revelou é que o custo não está distribuído: ele
-  está concentrado na transcrição."
-- **Achado (0:30)** — *é o ponto alto deste slide, diga com calma:*
-  > "O custo da transcrição cresce linearmente com a duração da reunião. O da sumarização não
-  > cresce, porque eu limito o contexto em 300 tokens por seção. A consequência é contraintuitiva:
-  > **quanto maior a reunião, melhor o fator de tempo real** — numa reunião de dois minutos o
-  > custo fixo da sumarização domina; numa de dez, ele se dilui."
-- **Limitações (0:20).** Comece pela primeira, que é a mais específica: "abaixo de três minutos a
-  transcrição não chega a 500 tokens, então existe uma única janela e o agrupamento semântico não
-  tem o que agrupar." Mostra que você conhece a aritmética do próprio parâmetro. Depois cite o
-  sumarizador como gargalo de qualidade e a ausência de diarização.
+- **Procedência (20s).** Diga antes que perguntem: só o pré-processamento foi medido; transcrição
+  e sumarização são projeção, e é isso que a faixa sombreada do gráfico representa.
+- **Figura 1 (20s).** Aponte as duas curvas. Uma sobe, a outra não. Não leia valores um a um.
+- **Achado (35s)** — *ponto alto da apresentação:*
+  > "O custo da transcrição cresce linearmente com a duração. O da sumarização não cresce, porque
+  > eu limito o contexto em 300 tokens. A consequência é contraintuitiva: **quanto maior a reunião,
+  > melhor o fator de tempo real.**"
 
-## Slide 8 · Considerações finais (12:00 – 13:30)
+## Slide 8 · Resultados — limitações e escopo (11:00 – 12:05)
+
+- **Banda telefônica (35s).** A limitação mais específica, e a que demonstra domínio do pressuposto
+  do método: o sistema **aceita** um áudio de telefonia e reamostra sem reclamar, mas a faixa de
+  3,4 a 8 kHz chega vazia — degradação silenciosa. Por isso o escopo está declarado.
+- **Limite de segmentação (15s).** Abaixo de ~3 min há uma única janela e o agrupamento não atua.
+  É aritmética do parâmetro que escolhi, não falha do modelo de representação.
+- **Ameaças à validade (15s).** Amostra pequena, avaliador único e tempos ainda não confirmados em
+  rodada controlada. Dizer antes desarma a pergunta.
+
+## Slide 9 · Considerações finais (12:05 – 13:25)
 
 **Feche o arco: retome literalmente o objetivo do slide 3.**
 
@@ -229,7 +235,7 @@ tente rodar o pipeline ao vivo.
 
 ---
 
-## Slides 9–10 · Referências e agradecimentos (13:30 – 14:00)
+## Slides 10–11 · Referências e agradecimentos (13:25 – 13:56)
 
 Não leia a lista. Diga apenas:
 
